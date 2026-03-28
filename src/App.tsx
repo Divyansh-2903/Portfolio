@@ -15,13 +15,12 @@ import Hero from './components/Hero';
 import SocialProof from './components/SocialProof';
 import Services from './components/Services';
 import SelectedWorks from './components/SelectedWorks';
-import About from './components/About';
+import BentoGrid from './components/BentoGrid';
 import Testimonials from './components/Testimonials';
-import Channel from './components/Channel';
-import TechStack from './components/TechStack';
 import FAQ from './components/FAQ';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import Story from './components/Story';
 
 function Home() {
   return (
@@ -35,11 +34,10 @@ function Home() {
       <Hero />
       <SocialProof />
       <Services />
+      <Story />
       <SelectedWorks />
-      <About />
+      <BentoGrid />
       <Testimonials />
-      <Channel />
-      <TechStack />
       <FAQ />
       <Contact />
     </motion.main>

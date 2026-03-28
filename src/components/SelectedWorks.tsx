@@ -1,6 +1,8 @@
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import React, { useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 // Tilt Card Component
 const TiltCard = ({ children, className }: { children: React.ReactNode, className?: string }) => {
@@ -51,6 +53,7 @@ const TiltCard = ({ children, className }: { children: React.ReactNode, classNam
 };
 
 export default function SelectedWorks() {
+  const container = useRef<HTMLElement>(null);
   const projects = [
     {
       id: 'onecliphub',
@@ -81,15 +84,52 @@ export default function SelectedWorks() {
     },
   ];
 
+  useGSAP(() => {
+    // Heading reveal
+    gsap.from('.work-heading', {
+      scrollTrigger: { trigger: container.current, start: 'top 80%' },
+      y: 30,
+      opacity: 0,
+      duration: 1,
+      ease: 'power3.out',
+    });
+
+    // Parallax entry for work cards
+    const cards = gsap.utils.toArray('.work-card');
+    cards.forEach((card: any, i) => {
+      gsap.from(card, {
+        scrollTrigger: {
+          trigger: card,
+          start: 'top 85%',
+        },
+        y: 80,
+        opacity: 0,
+        duration: 1.2,
+        ease: 'power3.out',
+      });
+      
+      // Slight parallax on scroll for the image inside
+      const img = card.querySelector('.parallax-img');
+      if (img) {
+        gsap.to(img, {
+          yPercent: 10,
+          scale: 1.05,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          }
+        });
+      }
+    });
+  }, { scope: container });
+
   return (
-    <section id="work" className="py-24 relative bg-bg">
+    <section ref={container} id="work" className="py-24 relative bg-bg overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8"
-        >
+        <div className="work-heading mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div>
             <div className="flex items-center gap-4 mb-4">
               <span className="text-primary font-mono text-sm tracking-widest uppercase">02 / Work</span>
@@ -102,26 +142,24 @@ export default function SelectedWorks() {
           <a href="#" className="text-sm font-mono uppercase tracking-widest text-text-secondary hover:text-primary transition-colors flex items-center gap-2">
             View All Projects <ArrowUpRight size={16} />
           </a>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ perspective: 1000 }}>
           {projects.map((project, index) => (
-            <motion.div
+            <div
               key={project.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ delay: index * 0.1 }}
-              className={`${project.colSpan} ${project.aspect} relative`}
+              className={`work-card ${project.colSpan} ${project.aspect} relative`}
             >
-              <TiltCard>
+              <TiltCard className="tilt-inner">
                 {/* Background Image */}
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  referrerPolicy="no-referrer"
-                />
+                <div className="absolute inset-0 w-full h-full object-cover">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="parallax-img w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 origin-center"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
                 
                 {/* Content Overlay */}
                 <div className="absolute inset-0 z-20 p-8 flex flex-col justify-end" style={{ transform: "translateZ(50px)" }}>
@@ -149,7 +187,7 @@ export default function SelectedWorks() {
                   </div>
                 </div>
               </TiltCard>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

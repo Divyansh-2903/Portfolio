@@ -13,19 +13,22 @@ export default function TextReveal({ children, className = '', delay = 0, wordMo
   const container = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    gsap.from('.reveal-item', {
-      scrollTrigger: {
-        trigger: container.current,
-        start: 'top 85%',
-        toggleActions: 'play none none reverse',
-      },
-      y: 80,
-      opacity: 0,
-      rotateX: -45,
-      stagger: 0.04,
-      duration: 1.2,
-      ease: 'power3.out',
-      delay,
+    let mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      gsap.from('.reveal-item', {
+        scrollTrigger: {
+          trigger: container.current,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse',
+        },
+        y: 80,
+        opacity: 0,
+        rotateX: -45,
+        stagger: 0.04,
+        duration: 1.2,
+        ease: 'power3.out',
+        delay,
+      });
     });
   }, { scope: container });
 

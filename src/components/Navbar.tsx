@@ -69,7 +69,7 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className="text-sm font-medium text-text-secondary hover:text-white px-5 py-2 rounded-full hover:bg-white/10 transition-all"
+                className="text-sm font-medium text-text-secondary hover:text-white px-5 py-2 rounded-full hover:bg-white/10 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-black"
               >
                 {link.name}
               </a>
@@ -80,7 +80,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             <button
               onClick={toggleSound}
-              className="text-text-secondary hover:text-primary p-2 rounded-full hover:bg-white/5 transition-all focus:outline-none"
+              className="text-text-secondary hover:text-primary p-2 rounded-full hover:bg-white/5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-black"
               aria-label="Toggle Sound"
             >
               {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
@@ -123,7 +123,7 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className="text-5xl font-display text-white hover:text-primary transition-colors uppercase tracking-tight"
+                  className="text-5xl font-display text-white hover:text-primary transition-colors duration-200 uppercase tracking-tight focus-visible:outline-none focus-visible:underline focus-visible:decoration-primary focus-visible:underline-offset-8"
                 >
                   {link.name}
                 </motion.a>

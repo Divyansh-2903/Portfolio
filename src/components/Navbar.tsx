@@ -1,13 +1,12 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Volume2, VolumeX } from 'lucide-react';
-import { useSoundEffects } from '../hooks/useSoundEffects';
+import { Menu, X } from 'lucide-react';
 import { useLenis } from 'lenis/react';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isSoundEnabled, toggleSound } = useSoundEffects();
   const lenis = useLenis();
 
   useEffect(() => {
@@ -19,25 +18,37 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: 'Work', href: '#work' },
-    { name: 'Services', href: '#services' },
-    { name: 'About', href: '#about' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Work', href: '/work' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/#contact' },
   ];
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    if (lenis) {
-      lenis.scrollTo(href === 'body' ? 0 : href, { offset: -80 });
-    } else {
-      // Fallback
-      if (href === 'body') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
     setMobileMenuOpen(false);
+    
+    // If it's a hash link (e.g. #contact), scroll to it if on Home
+    if (href.startsWith('/#')) {
+      if (window.location.pathname !== '/') {
+        window.location.href = href;
+      } else {
+        const id = href.substring(1);
+        if (lenis) {
+          lenis.scrollTo(id, { offset: -80 });
+        } else {
+          document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    } else if (href === '/') {
+      if (window.location.pathname === '/') {
+        if (lenis) lenis.scrollTo(0, { offset: -80 });
+        else window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+         window.location.href = href;
+      }
+    } else {
+      window.location.href = href;
+    }
   };
 
   return (
@@ -46,30 +57,31 @@ export default function Navbar() {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none"
+        className="fixed top-6 left-0 right-0 z-[100] flex justify-center px-4 pointer-events-none"
       >
         <div 
-          className={`pointer-events-auto flex items-center justify-between transition-all duration-500 rounded-full px-6 py-3 ${
+          className={`pointer-events-auto relative overflow-hidden flex items-center justify-between transition-all duration-500 rounded-full px-6 py-3 ${
             scrolled ? 'bg-[#0f0f0f]/80 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/80 w-full max-w-4xl' : 'bg-transparent w-full max-w-7xl'
           }`}
         >
+
           {/* Logo */}
           <a 
-            href="#top" 
-            onClick={(e) => handleNavClick(e, 'body')}
-            className={`font-mono font-bold tracking-tighter text-white transition-all ${scrolled ? 'text-lg' : 'text-2xl'}`}
+            href="/" 
+            onClick={(e) => handleNavClick(e, '/')}
+            className={`font-mono font-bold tracking-tighter text-white transition-all relative z-10 ${scrolled ? 'text-lg' : 'text-2xl'}`}
           >
             DIVYANSH<span className="text-primary">.</span>
           </a>
 
           {/* Desktop Links (Pill Container) */}
-          <div className="hidden md:flex items-center gap-1 bg-white/5 border border-white/5 rounded-full p-1">
+          <div className="hidden md:flex items-center gap-1 bg-[#080808]/60 backdrop-blur-lg border border-white/10 rounded-full p-1 relative z-10">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className="text-sm font-medium text-text-secondary hover:text-white px-5 py-2 rounded-full hover:bg-white/10 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-black"
+                className="text-sm font-medium text-white hover:text-white/80 px-5 py-2 rounded-full hover:bg-white/10 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-black relative z-10"
               >
                 {link.name}
               </a>
@@ -77,14 +89,8 @@ export default function Navbar() {
           </div>
 
           {/* Right Side Controls */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={toggleSound}
-              className="text-text-secondary hover:text-primary p-2 rounded-full hover:bg-white/5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-black"
-              aria-label="Toggle Sound"
-            >
-              {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
-            </button>
+          <div className="flex items-center gap-4 relative z-10">
+
 
             <div className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 transition-colors ${scrolled ? 'bg-primary/20 border-primary/30' : 'bg-white/5 backdrop-blur-sm'}`}>
               <span className="relative flex h-2 w-2">

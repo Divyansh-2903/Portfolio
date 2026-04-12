@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import Marquee from 'react-fast-marquee';
 import { Mail, Phone } from 'lucide-react';
 
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -45,13 +46,13 @@ export default function Footer() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/10 bg-surface/50 backdrop-blur-md"
+            className="relative inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/10 bg-surface/50 backdrop-blur-md"
           >
-            <span className="relative flex h-3 w-3">
+            <span className="relative z-10 flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
             </span>
-            <span className="text-sm font-mono text-text-secondary">
+            <span className="relative z-10 text-sm font-mono text-text-secondary">
               Currently open to freelance — Updated {currentYear}
             </span>
           </motion.div>
@@ -73,11 +74,11 @@ export default function Footer() {
             </a>
             <span className="hidden sm:block w-px h-5 bg-white/10" />
             <a
-              href="tel:+919876543210"
+              href="tel:+918302506868"
               className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors duration-200 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg rounded"
             >
               <Phone size={16} className="text-primary" />
-              +91 98765 43210
+              +91 83025 06868
             </a>
           </motion.div>
 

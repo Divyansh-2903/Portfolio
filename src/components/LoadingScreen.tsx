@@ -19,7 +19,7 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void; 
       animate={{ opacity: isComplete ? 0 : 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
-      className="fixed inset-0 z-[200] bg-bg flex items-center justify-center overflow-hidden"
+      className="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden bg-[#060010]/80 backdrop-blur-sm"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}

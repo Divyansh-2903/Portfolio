@@ -1,6 +1,18 @@
 import { motion } from 'framer-motion';
 import { Mail, Linkedin, Github, MessageCircle } from 'lucide-react';
 
+const SocialBadge = ({ href, Icon, colorMap, label }: any) => (
+  <a
+    href={href}
+    className="group/btn p-6 rounded-2xl bg-surface border border-white/5 flex flex-col items-center justify-center gap-4 hover:border-primary/50 transition-colors"
+  >
+    <div className={`w-12 h-12 rounded-full bg-white/5 flex items-center justify-center transition-colors ${colorMap}`}>
+      <Icon size={24} />
+    </div>
+    <span className="font-mono text-sm uppercase tracking-wider text-text-secondary group-hover/btn:text-white transition-colors">{label}</span>
+  </a>
+);
+
 export default function Contact() {
   return (
     <section id="contact" className="py-24 relative overflow-hidden bg-bg">
@@ -88,30 +100,10 @@ export default function Contact() {
             className="flex flex-col gap-12"
           >
             <div className="grid grid-cols-2 gap-4">
-              <a href="mailto:hello@example.com" className="group p-6 rounded-2xl bg-surface border border-white/5 flex flex-col items-center justify-center gap-4 hover:border-primary/50 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
-                  <Mail size={24} />
-                </div>
-                <span className="font-mono text-sm uppercase tracking-wider text-text-secondary group-hover:text-white transition-colors">Email</span>
-              </a>
-              <a href="#" className="group p-6 rounded-2xl bg-surface border border-white/5 flex flex-col items-center justify-center gap-4 hover:border-primary/50 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#0A66C2]/20 group-hover:text-[#0A66C2] transition-colors">
-                  <Linkedin size={24} />
-                </div>
-                <span className="font-mono text-sm uppercase tracking-wider text-text-secondary group-hover:text-white transition-colors">LinkedIn</span>
-              </a>
-              <a href="#" className="group p-6 rounded-2xl bg-surface border border-white/5 flex flex-col items-center justify-center gap-4 hover:border-primary/50 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#25D366]/20 group-hover:text-[#25D366] transition-colors">
-                  <MessageCircle size={24} />
-                </div>
-                <span className="font-mono text-sm uppercase tracking-wider text-text-secondary group-hover:text-white transition-colors">WhatsApp</span>
-              </a>
-              <a href="#" className="group p-6 rounded-2xl bg-surface border border-white/5 flex flex-col items-center justify-center gap-4 hover:border-primary/50 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/20 group-hover:text-white transition-colors">
-                  <Github size={24} />
-                </div>
-                <span className="font-mono text-sm uppercase tracking-wider text-text-secondary group-hover:text-white transition-colors">GitHub</span>
-              </a>
+              <SocialBadge href="mailto:hello@example.com" Icon={Mail} colorMap="group-hover/btn:bg-primary/20 group-hover/btn:text-primary" label="Email" />
+              <SocialBadge href="#" Icon={Linkedin} colorMap="group-hover/btn:bg-[#0A66C2]/20 group-hover/btn:text-[#0A66C2]" label="LinkedIn" />
+              <SocialBadge href="#" Icon={MessageCircle} colorMap="group-hover/btn:bg-[#25D366]/20 group-hover/btn:text-[#25D366]" label="WhatsApp" />
+              <SocialBadge href="#" Icon={Github} colorMap="group-hover/btn:bg-white/20 group-hover/btn:text-white" label="GitHub" />
             </div>
 
             <div className="p-8 rounded-3xl bg-surface border border-white/5 text-center">

@@ -59,20 +59,7 @@ export default function GlobalElements() {
           mass: 0.5,
         }}
       />
-      
-      {/* Cursor Glow */}
-      <motion.div
-        className="fixed top-0 left-0 w-32 h-32 rounded-full bg-primary/20 blur-2xl pointer-events-none z-[99]"
-        animate={{
-          x: mousePosition.x - 64,
-          y: mousePosition.y - 64,
-        }}
-        transition={{
-          type: 'spring',
-          stiffness: 100,
-          damping: 30,
-        }}
-      />
     </>
+
   );
 }

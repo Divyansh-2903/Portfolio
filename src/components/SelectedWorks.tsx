@@ -52,6 +52,12 @@ const TiltCard = ({ children, className }: { children: React.ReactNode, classNam
   );
 };
 
+const TechTag: React.FC<{ t: string }> = ({ t }) => (
+  <span className="px-3 py-1 text-xs font-mono rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white cursor-default">
+    {t}
+  </span>
+);
+
 export default function SelectedWorks() {
   const container = useRef<HTMLElement>(null);
   const projects = [
@@ -165,9 +171,7 @@ export default function SelectedWorks() {
                 <div className="absolute inset-0 z-20 p-8 flex flex-col justify-end" style={{ transform: "translateZ(50px)" }}>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {project.tech.map((t, i) => (
-                      <span key={i} className="px-3 py-1 text-xs font-mono rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white">
-                        {t}
-                      </span>
+                      <TechTag key={i} t={t} />
                     ))}
                   </div>
                   

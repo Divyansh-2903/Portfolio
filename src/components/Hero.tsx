@@ -1,13 +1,11 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Mail } from 'lucide-react';
-import Marquee from 'react-fast-marquee';
-import { lazy, Suspense } from 'react';
 
-// ── Lazy-load the heavy 3D canvas AFTER first paint ──────────────────────────
-const InteractiveHero = lazy(() => import('./canvas/InteractiveHero'));
+import RotatingText from './RotatingText';
 
-// ── Framer Motion variants for staggered entrance (GPU-composited transforms) ─
+
+// ── Framer Motion variants for staggered entrance ─────────────────────────
 const containerVariants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
@@ -34,132 +32,87 @@ const titleReveal = {
 
 export default function Hero() {
   const container = useRef<HTMLElement>(null);
-  // Mount the 3D canvas only after browser is idle (after first paint settles)
-  const [mountCanvas, setMountCanvas] = useState(false);
-
-  useEffect(() => {
-    // requestIdleCallback fires after the browser is done with initial layout/paint
-    const id = 'requestIdleCallback' in window
-      ? (window as Window & { requestIdleCallback: (cb: () => void) => number }).requestIdleCallback(() => setMountCanvas(true))
-      : setTimeout(() => setMountCanvas(true), 300);
-
-    return () => {
-      if ('cancelIdleCallback' in window) {
-        (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(id as number);
-      } else {
-        clearTimeout(id as ReturnType<typeof setTimeout>);
-      }
-    };
-  }, []);
-
-  const skills = [
-    'REACT', 'NEXT.JS', 'NODE.JS', 'VIDEO EDITING', 'MOTION GRAPHICS',
-    'AFTER EFFECTS', 'DIGITAL MARKETING', 'TYPESCRIPT'
-  ];
 
   return (
     <section
       ref={container}
-      className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-20"
+      className="relative min-h-screen h-screen flex flex-col justify-center items-center overflow-hidden pt-20"
     >
-      {/* Background dot grid — pure CSS, no network request */}
-      <div
-        className="absolute inset-0 z-0 opacity-[0.12] pointer-events-none"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
-        }}
-      />
-
-      {/* 3D Canvas — mounted only after idle, so it never blocks LCP */}
-      {mountCanvas && (
-        <div className="absolute inset-0 z-0 pointer-events-auto">
-          <Suspense fallback={null}>
-            <InteractiveHero />
-          </Suspense>
-        </div>
-      )}
-
-      {/* Main content — pure Framer Motion, no GSAP on critical path */}
+      {/* Main content — centered layout using more of the full screen */}
       <motion.div
-        className="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center z-10 pointer-events-none"
+        className="w-full max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center z-10 relative pointer-events-none"
         variants={containerVariants}
         initial="hidden"
         animate="show"
       >
-        {/* Left Content */}
-        <div className="flex flex-col gap-6 pointer-events-auto">
-
-          {/* Headline */}
-          <div className="space-y-2 overflow-hidden">
-            <motion.h1
-              variants={titleReveal}
-              className="font-display text-6xl sm:text-7xl md:text-8xl lg:text-[100px] leading-[0.85] tracking-tight uppercase text-white drop-shadow-2xl"
-            >
-              I BUILD DIGITAL
-              <div className="text-primary mt-2">EXPERIENCES.</div>
-            </motion.h1>
+        {/* Subtitle / Rotating Text (Placed ABOVE headline) */}
+        <motion.div
+           variants={fadeUp}
+           className="flex flex-col items-center gap-4 mb-6 pointer-events-auto"
+        >
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <span className="font-display text-xl md:text-2xl lg:text-3xl text-white uppercase tracking-tight drop-shadow-md">
+              Crafting Digital Experiences for
+            </span>
+            <RotatingText
+              texts={['Startups', 'Founders', 'Brands', 'Creators', 'Dreamers']}
+              mainClassName="w-[160px] md:w-[200px] lg:w-[220px] flex justify-center items-center px-4 py-1.5 bg-primary/20 border border-primary/50 text-primary shadow-[0_0_15px_rgba(167,139,250,0.4)] overflow-hidden rounded-xl font-display text-xl md:text-2xl lg:text-3xl uppercase tracking-tight whitespace-nowrap"
+              staggerFrom="last"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '-120%' }}
+              staggerDuration={0.025}
+              splitLevelClassName="overflow-hidden pb-0.5"
+              transition={{ type: 'spring', damping: 30, stiffness: 400 }}
+              rotationInterval={2000}
+            />
           </div>
+        </motion.div>
 
-          {/* Subtext */}
-          <motion.p
-            variants={fadeUp}
-            className="text-lg md:text-xl text-text-secondary font-medium max-w-lg mt-4 drop-shadow-md"
+        {/* Headline */}
+        <div className="w-full flex justify-center items-center mb-6">
+          <motion.h1
+            variants={titleReveal}
+            className="font-display text-[12vw] sm:text-[11vw] md:text-[10vw] lg:text-[150px] leading-none tracking-tighter uppercase grid grid-cols-2 gap-3 sm:gap-8 md:gap-16 lg:gap-24 z-10 mix-blend-screen w-full"
           >
-            Fullstack Developer · Video Editor · Motion Graphics Designer — Based in India
-          </motion.p>
-
-          {/* Name */}
-          <motion.div
-            variants={fadeUp}
-            className="text-sm font-mono text-white/50 uppercase tracking-widest"
-          >
-            Divyansh Saxena
-          </motion.div>
-
-          {/* CTA Buttons */}
-          <motion.div
-            variants={fadeUp}
-            className="flex flex-wrap items-center gap-4 pt-4"
-          >
-            <a
-              href="#work"
-              className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white bg-primary overflow-hidden rounded-full transition-transform hover:-translate-y-1 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] shadow-[0_0_20px_rgba(255,92,0,0.3)] hover:shadow-[0_0_30px_rgba(255,92,0,0.5)]"
-            >
-              <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black" />
-              <span className="relative flex items-center gap-2">
-                See My Work <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </span>
-            </a>
-
-            <a
-              href="#contact"
-              className="group inline-flex items-center justify-center px-8 py-4 font-bold text-white border border-white/20 rounded-full hover:bg-white/5 transition-all hover:-translate-y-1 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none hover:border-primary/50 backdrop-blur-sm"
-            >
-              <span className="flex items-center gap-2">
-                Let's Talk <Mail size={18} />
-              </span>
-            </a>
-          </motion.div>
+            <span className="text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] text-right">DIVYANSH</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-300 to-indigo-300 drop-shadow-[0_0_30px_rgba(167,139,250,0.6)] text-left">SAXENA</span>
+          </motion.h1>
         </div>
 
-        {/* Empty right spacer for layout balance */}
-        <div className="w-full h-full hidden lg:block pointer-events-none" />
-      </motion.div>
+        {/* Sub-subtitle */}
+        <motion.p 
+          variants={fadeUp}
+          className="text-sm md:text-base text-white w-full max-w-xl font-bold tracking-wide uppercase mt-2 mb-32 drop-shadow-lg"
+        >
+          Fullstack Developer &nbsp;&middot;&nbsp; UI/UX Designer &nbsp;&middot;&nbsp; Motion Graphics
+        </motion.p>
 
-      {/* Skills Marquee */}
-      <div className="absolute bottom-0 left-0 right-0 border-y border-white/10 bg-surface/50 backdrop-blur-md py-3 z-20 pointer-events-auto flex">
-        <Marquee gradient={false} speed={40} autoFill className="overflow-hidden flex-1">
-          {skills.map((skill, index) => (
-            <div key={index} className="flex items-center">
-              <span className="text-sm font-mono font-medium text-text-secondary px-8 tracking-wider">
-                {skill}
-              </span>
-              <span className="text-primary/50 text-xs">·</span>
-            </div>
-          ))}
-        </Marquee>
-      </div>
+        {/* CTA Buttons */}
+        <motion.div
+          variants={fadeUp}
+          className="flex flex-wrap items-center justify-center gap-6 pt-4 pointer-events-auto relative z-50 w-full"
+        >
+          <a
+            href="#contact"
+            className="group relative inline-flex items-center justify-center px-10 py-5 font-bold text-white border border-white/20 bg-[#080808]/60 backdrop-blur-lg rounded-full hover:bg-white/10 transition-all hover:-translate-y-1 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none hover:border-primary/50 text-lg sm:text-xl"
+          >
+            <span className="flex items-center gap-3">
+              Let's Talk <Mail size={22} />
+            </span>
+          </a>
+
+          <a
+            href="#work"
+            className="group relative inline-flex items-center justify-center px-10 py-5 font-bold text-white bg-primary shadow-[0_0_30px_rgba(167,139,250,0.5)] overflow-hidden rounded-full transition-transform hover:-translate-y-1 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] text-lg sm:text-xl"
+          >
+            <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black" />
+            <span className="relative flex items-center gap-3">
+              See My Work <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
+            </span>
+          </a>
+        </motion.div>
+      </motion.div>
     </section>
   );
 }

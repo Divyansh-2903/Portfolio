@@ -1,15 +1,46 @@
 import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { Code2, Palette, Cpu, ArrowUpRight } from 'lucide-react';
+import { Palette, Cpu, ExternalLink } from 'lucide-react';
+import FlowingMenu from './FlowingMenu';
 
-/* ─── Data ──────────────────────────────────────────────────── */
-const tools = [
-  'React', 'TypeScript', 'Next.js', 'Node.js',
-  'Tailwind CSS', 'Framer Motion', 'Supabase', 'Prisma',
-  'PostgreSQL', 'Vercel', 'Figma', 'After Effects',
+/* ─── Work Timeline Data ────────────────────────────────────── */
+const timelineItems = [
+  {
+    link: '#',
+    text: 'Freelance — Web Developer',
+    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop',
+    period: '2024 — Present',
+    role: 'Fullstack Developer',
+    desc: 'Building custom web apps, portfolios, and SaaS products for international clients. React, Next.js, Node.js, Supabase.',
+  },
+  {
+    link: '#',
+    text: 'Motion Architect — Video Editor',
+    image: 'https://images.unsplash.com/photo-1536240478700-b869ad10da2a?q=80&w=800&auto=format&fit=crop',
+    period: '2024 — Present',
+    role: 'Motion Designer',
+    desc: 'Crafting high-impact reels, YouTube content, and brand films. After Effects, Premiere Pro, DaVinci Resolve.',
+  },
+  {
+    link: '#',
+    text: 'UI/UX Designer',
+    image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?q=80&w=800&auto=format&fit=crop',
+    period: '2024 — Present',
+    role: 'Product Designer',
+    desc: 'Designing cinematic, conversion-focused interfaces. Figma, high-fidelity prototypes, design systems.',
+  },
+  {
+    link: '#',
+    text: 'Learning Phase — CS Student',
+    image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=800&auto=format&fit=crop',
+    period: '2023 — 2024',
+    role: 'CS Undergraduate',
+    desc: 'Laying the technical foundation. Data structures, algorithms, system design, and first real-world projects.',
+  },
 ];
 
-const editorialColumns = [
+/* ─── Design DNA Cards ──────────────────────────────────────── */
+const designCards = [
   {
     num: '01', tag: 'Design DNA', accent: '#a78bfa',
     gradient: 'linear-gradient(135deg, #1a0533 0%, #0d0122 40%, #1d0845 100%)',
@@ -24,17 +55,10 @@ const editorialColumns = [
     title: 'Precision Engineering',
     body: 'Beyond the visuals lies a rigid technical foundation. React, TypeScript, performant animations, scalable state management, and type-safe architectures.',
   },
-  {
-    num: '03', tag: 'Arsenal', accent: '#c084fc',
-    gradient: 'linear-gradient(135deg, #1e0533 0%, #100224 60%, #1a0540 100%)',
-    Icon: Code2,
-    title: 'Technical Stack',
-    body: 'A curated toolkit built for performance and expressiveness — from database to deployment, every layer is intentional.',
-  },
 ];
 
 const stats = [
-  { tag: '01 // Time',   val: '2019', label: 'Year Started'   },
+  { tag: '01 // Time',   val: '2024', label: 'Year Started'   },
   { tag: '02 // Output', val: '21+',  label: 'Projects Built' },
   { tag: '03 // Reach',  val: '12+',  label: 'Happy Clients'  },
   { tag: '04 // Scope',  val: '5+',   label: 'Countries'      },
@@ -75,7 +99,6 @@ function GlareCard({
         transition: 'box-shadow 0.4s ease, border-color 0.3s ease',
       }}
     >
-      {/* Top accent line */}
       <div
         className="absolute inset-x-0 top-0 h-px transition-opacity duration-500"
         style={{
@@ -83,7 +106,6 @@ function GlareCard({
           opacity: hovered ? 1 : 0.3,
         }}
       />
-      {/* Mouse glare */}
       <div
         className="absolute inset-0 pointer-events-none mix-blend-overlay transition-opacity duration-300"
         style={{
@@ -91,7 +113,6 @@ function GlareCard({
           background: `radial-gradient(circle 300px at ${mouse.x}px ${mouse.y}px, rgba(255,255,255,0.14), transparent 70%)`,
         }}
       />
-      {/* Ambient glow orb */}
       <div
         className="absolute -top-16 -right-16 w-48 h-48 rounded-full pointer-events-none transition-opacity duration-500"
         style={{
@@ -129,7 +150,7 @@ export default function AboutSection() {
   return (
     <section id="about" ref={sectionRef} className="relative py-32 bg-bg overflow-hidden">
 
-      {/* ── Ambient background glows (same as Contact) ── */}
+      {/* ── Ambient background glows ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-32 -left-32 w-[700px] h-[700px] rounded-full"
           style={{ background: 'radial-gradient(circle, #c4b5fd18 0%, transparent 60%)', filter: 'blur(80px)' }} />
@@ -137,11 +158,9 @@ export default function AboutSection() {
           style={{ background: 'radial-gradient(circle, #818cf812 0%, transparent 60%)', filter: 'blur(100px)' }} />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full"
           style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 100%, #a78bfa10 0%, transparent 70%)', filter: 'blur(60px)' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full"
-          style={{ background: 'radial-gradient(circle, #a78bfa08 0%, transparent 60%)', filter: 'blur(100px)' }} />
       </div>
 
-      {/* ── Tinted grid (same as Contact) ── */}
+      {/* ── Tinted grid ── */}
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.018]"
         style={{
@@ -178,14 +197,13 @@ export default function AboutSection() {
           </div>
         </motion.div>
 
-        {/* ── Purple divider ── */}
         <div
           className="h-px w-full mb-16"
           style={{ background: 'linear-gradient(90deg, transparent, rgba(167,139,250,0.25), transparent)' }}
         />
 
         {/* ── Hero Row: Philosophy + Portrait ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 mb-6">
 
           {/* Philosophy card */}
           <motion.div
@@ -199,7 +217,7 @@ export default function AboutSection() {
               accentColor="#a78bfa"
               className="h-full"
             >
-              <div className="p-10 md:p-14 flex flex-col justify-between min-h-[380px]">
+              <div className="p-10 md:p-14 flex flex-col justify-between min-h-[420px]">
                 <span className="font-mono text-[10px] text-primary uppercase tracking-[0.3em] mb-8 block">
                   // Philosophy
                 </span>
@@ -229,7 +247,7 @@ export default function AboutSection() {
             </GlareCard>
           </motion.div>
 
-          {/* Portrait card */}
+          {/* Real portrait card */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -241,20 +259,20 @@ export default function AboutSection() {
               accentColor="#c084fc"
               className="h-full"
             >
-              <div className="relative min-h-[380px] overflow-hidden rounded-3xl">
+              <div className="relative min-h-[420px] overflow-hidden rounded-3xl">
                 <img
-                  src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=800&auto=format&fit=crop"
+                  src="/assets/divyansh.jpg"
                   alt="Divyansh Saxena — Creative Developer"
-                  className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-75"
+                  className="absolute inset-0 w-full h-full object-cover object-top"
+                  style={{ objectPosition: 'center top' }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0e0526] via-[#0e052640] to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0e0526cc] via-transparent to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-8">
                   <p className="font-mono text-xs text-primary uppercase tracking-widest mb-1">Divyansh Saxena</p>
                   <p className="font-mono text-[10px] text-white/40 tracking-wider">Creative Developer · Jaipur, India</p>
                 </div>
-                {/* Corner data tag */}
                 <div className="absolute top-6 right-6 px-3 py-1.5 rounded-full"
-                  style={{ background: 'rgba(192,132,252,0.12)', border: '1px solid rgba(192,132,252,0.25)' }}>
+                  style={{ background: 'rgba(192,132,252,0.15)', border: '1px solid rgba(192,132,252,0.3)', backdropFilter: 'blur(8px)' }}>
                   <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: '#c084fc' }}>
                     Creative Dev
                   </span>
@@ -264,9 +282,9 @@ export default function AboutSection() {
           </motion.div>
         </div>
 
-        {/* ── Editorial Details (3 cards) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          {editorialColumns.map((col, i) => (
+        {/* ── Design DNA Cards (2 cards, arsenal removed) ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {designCards.map((col, i) => (
             <motion.div
               key={col.num}
               initial={{ opacity: 0, y: 30 }}
@@ -275,7 +293,7 @@ export default function AboutSection() {
               transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
               <GlareCard gradient={col.gradient} accentColor={col.accent} className="h-full">
-                <div className="p-8 flex flex-col h-full">
+                <div className="p-8 flex flex-col h-full min-h-[220px]">
                   <div className="flex items-center justify-between mb-6">
                     <span className="font-mono text-[10px] uppercase tracking-[0.25em]" style={{ color: col.accent }}>
                       {col.num} // {col.tag}
@@ -289,21 +307,84 @@ export default function AboutSection() {
                   </div>
                   <h3 className="font-display text-2xl uppercase tracking-tight text-white mb-4">{col.title}</h3>
                   <p className="text-white/45 text-sm leading-relaxed font-body flex-1">{col.body}</p>
-                  {col.num === '03' && (
-                    <ul className="grid grid-cols-2 gap-y-2.5 mt-6 pt-6"
-                      style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                      {tools.map((tool) => (
-                        <li key={tool} className="font-mono text-[11px] tracking-wider" style={{ color: col.accent + 'cc' }}>
-                          — {tool}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
                 </div>
               </GlareCard>
             </motion.div>
           ))}
         </div>
+
+        {/* ── Work Timeline ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-6"
+        >
+          <div className="flex items-center gap-4 mb-8">
+            <span className="font-mono text-[10px] text-primary uppercase tracking-[0.3em]">[ Career Timeline ]</span>
+            <div className="h-px bg-white/10 flex-1" />
+            <span className="font-mono text-[10px] text-white/25 uppercase tracking-widest">2024 — Present</span>
+          </div>
+
+          {/* Flowing Menu Timeline */}
+          <div
+            className="rounded-3xl overflow-hidden"
+            style={{
+              border: '1px solid rgba(255,255,255,0.07)',
+              background: 'linear-gradient(135deg, #1e0b3e 0%, #0e0526 40%, #1a0840 100%)',
+              minHeight: '420px',
+            }}
+          >
+            {/* Top accent line */}
+            <div
+              className="h-px w-full"
+              style={{ background: 'linear-gradient(90deg, transparent, #a78bfa, transparent)' }}
+            />
+            <FlowingMenu
+              items={timelineItems}
+              speed={18}
+              textColor="#ffffff"
+              bgColor="transparent"
+              marqueeBgColor="#a78bfa"
+              marqueeTextColor="#080808"
+              borderColor="rgba(255,255,255,0.08)"
+            />
+          </div>
+
+          {/* Timeline detail rows below FlowingMenu */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {timelineItems.map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="flex gap-4 p-5 rounded-2xl"
+                style={{
+                  background: 'rgba(167,139,250,0.04)',
+                  border: '1px solid rgba(167,139,250,0.12)',
+                }}
+              >
+                <div
+                  className="w-1 rounded-full flex-shrink-0 mt-1"
+                  style={{ background: 'linear-gradient(180deg, #a78bfa, #818cf8)', minHeight: '80px' }}
+                />
+                <div>
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="font-mono text-[10px] text-primary uppercase tracking-widest">{item.period}</span>
+                    <span className="font-mono text-[10px] text-white/20 uppercase tracking-widest">{item.role}</span>
+                  </div>
+                  <h4 className="font-display text-lg uppercase tracking-tight text-white mb-2">
+                    {item.text.split('—')[0].trim()}
+                  </h4>
+                  <p className="text-white/40 text-xs leading-relaxed font-body">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
 
         {/* ── Identity Reel ── */}
         <motion.div
@@ -318,15 +399,14 @@ export default function AboutSection() {
             <div className="h-px bg-white/10 flex-1" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6" style={{ minHeight: '480px' }}>
-            {/* Large image */}
-            <div className="md:col-span-7 h-full min-h-[480px]">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6" style={{ minHeight: '400px' }}>
+            <div className="md:col-span-7 h-full min-h-[400px]">
               <GlareCard
                 gradient="linear-gradient(135deg, #0a0215 0%, #050010 60%, #0d0320 100%)"
                 accentColor="#f472b6"
                 className="h-full"
               >
-                <div className="relative h-full overflow-hidden rounded-3xl min-h-[480px]">
+                <div className="relative h-full overflow-hidden rounded-3xl min-h-[400px]">
                   <ParallaxImage
                     src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=1600&auto=format&fit=crop"
                     alt="Photography"
@@ -343,15 +423,14 @@ export default function AboutSection() {
               </GlareCard>
             </div>
 
-            {/* Two stacked images */}
-            <div className="md:col-span-5 flex flex-col gap-6 h-full min-h-[480px]">
-              <div className="flex-1 min-h-[220px]">
+            <div className="md:col-span-5 flex flex-col gap-6 h-full min-h-[400px]">
+              <div className="flex-1 min-h-[185px]">
                 <GlareCard
                   gradient="linear-gradient(135deg, #021a0e 0%, #010d07 60%, #031a10 100%)"
                   accentColor="#34d399"
                   className="h-full"
                 >
-                  <div className="relative h-full overflow-hidden rounded-3xl min-h-[220px]">
+                  <div className="relative h-full overflow-hidden rounded-3xl min-h-[185px]">
                     <ParallaxImage
                       src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=800&auto=format&fit=crop"
                       alt="Travel"
@@ -359,20 +438,18 @@ export default function AboutSection() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#021a0e] via-transparent to-transparent opacity-80" />
                     <div className="absolute bottom-6 left-6">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.3em]" style={{ color: '#34d399' }}>
-                        Travel
-                      </span>
+                      <span className="font-mono text-[10px] uppercase tracking-[0.3em]" style={{ color: '#34d399' }}>Travel</span>
                     </div>
                   </div>
                 </GlareCard>
               </div>
-              <div className="flex-1 min-h-[220px]">
+              <div className="flex-1 min-h-[185px]">
                 <GlareCard
                   gradient="linear-gradient(135deg, #020f1a 0%, #010810 60%, #020d18 100%)"
                   accentColor="#60a5fa"
                   className="h-full"
                 >
-                  <div className="relative h-full overflow-hidden rounded-3xl min-h-[220px]">
+                  <div className="relative h-full overflow-hidden rounded-3xl min-h-[185px]">
                     <ParallaxImage
                       src="https://images.unsplash.com/photo-1551009175-8a68da93d5f9?q=80&w=800&auto=format&fit=crop"
                       alt="City Life"
@@ -380,9 +457,7 @@ export default function AboutSection() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#020f1a] via-transparent to-transparent opacity-80" />
                     <div className="absolute bottom-6 left-6">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.3em]" style={{ color: '#60a5fa' }}>
-                        City Life
-                      </span>
+                      <span className="font-mono text-[10px] uppercase tracking-[0.3em]" style={{ color: '#60a5fa' }}>City Life</span>
                     </div>
                   </div>
                 </GlareCard>
@@ -427,7 +502,6 @@ export default function AboutSection() {
           </GlareCard>
         </motion.div>
 
-        {/* ── Bottom divider ── */}
         <div
           className="h-px w-full mt-20"
           style={{ background: 'linear-gradient(90deg, transparent, rgba(167,139,250,0.2), transparent)' }}

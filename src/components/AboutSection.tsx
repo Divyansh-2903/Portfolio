@@ -217,7 +217,7 @@ export default function AboutSection() {
               accentColor="#a78bfa"
               className="h-full"
             >
-              <div className="p-10 md:p-14 flex flex-col justify-between min-h-[420px]">
+              <div className="p-10 md:p-14 flex flex-col justify-between min-h-[580px]">
                 <span className="font-mono text-[10px] text-primary uppercase tracking-[0.3em] mb-8 block">
                   // Philosophy
                 </span>
@@ -259,12 +259,12 @@ export default function AboutSection() {
               accentColor="#c084fc"
               className="h-full"
             >
-              <div className="relative min-h-[420px] overflow-hidden rounded-3xl">
+              <div className="relative min-h-[580px] overflow-hidden rounded-3xl">
                 <img
                   src="/assets/divyansh.jpg"
                   alt="Divyansh Saxena — Creative Developer"
-                  className="absolute inset-0 w-full h-full object-cover object-top"
-                  style={{ objectPosition: 'center top' }}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ objectPosition: 'center 10%' }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0e0526cc] via-transparent to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-8">

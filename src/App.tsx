@@ -14,8 +14,7 @@ import GlobalElements from './components/GlobalElements';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Services from './components/Services';
-import SelectedWorks from './components/SelectedWorks';
-import BentoGrid from './components/BentoGrid';
+import AboutSection from './components/AboutSection';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Story from './components/Story';
@@ -23,15 +22,7 @@ import Showcase from './components/Showcase';
 import Testimonials from './components/Testimonials';
 import GradualBlur from './components/GradualBlur';
 
-import FlowingMenu from './components/FlowingMenu';
 import LaserFlow from './components/canvas/LaserFlow';
-
-const demoItems = [
-  { link: '#', text: 'Mojave', image: 'https://picsum.photos/600/400?random=1' },
-  { link: '#', text: 'Sonoma', image: 'https://picsum.photos/600/400?random=2' },
-  { link: '#', text: 'Monterey', image: 'https://picsum.photos/600/400?random=3' },
-  { link: '#', text: 'Sequoia', image: 'https://picsum.photos/600/400?random=4' }
-];
 
 const Home: React.FC = () => {
   return (
@@ -58,17 +49,9 @@ const About: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.5 }}
-      className="relative z-10 pt-32 pb-24"
+      className="relative z-10 pt-20 pb-24"
     >
-      <div className="max-w-7xl mx-auto px-6 mb-12">
-        <h1 className="font-display text-5xl md:text-7xl lg:text-8xl uppercase tracking-tight text-white mb-4">
-          About <span className="text-primary">Me</span>
-        </h1>
-        <p className="text-xl text-text-secondary max-w-2xl">
-          I'm a fullstack developer and creative designer crafting polished digital experiences.
-        </p>
-      </div>
-      <BentoGrid />
+      <AboutSection />
       <Services />
     </motion.main>
   );
@@ -81,29 +64,35 @@ const Work: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.5 }}
-      className="relative z-10 pt-32 pb-24"
+      className="relative z-10"
     >
-      <div className="max-w-7xl mx-auto px-6 mb-12">
-        <h1 className="font-display text-5xl md:text-7xl lg:text-8xl uppercase tracking-tight text-white mb-4">
-          My <span className="text-primary">Work</span>
-        </h1>
-        <p className="text-xl text-text-secondary max-w-2xl">
-          A selection of recent projects and architectural explorations.
-        </p>
+      {/* Page-level hero header */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 pt-36 pb-0 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-0"
+        >
+          <div className="flex items-center gap-4 mb-6">
+            <span className="text-primary font-mono text-xs tracking-[0.3em] uppercase">[ Selected Work ]</span>
+            <div className="h-px bg-white/10 flex-1" />
+          </div>
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+            <h1 className="font-display text-[clamp(3.5rem,10vw,9rem)] uppercase tracking-[0.02em] leading-[0.85] text-white">
+              THE{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-300 to-indigo-300">
+                WORK
+              </span>
+            </h1>
+            <p className="text-white/35 font-mono text-sm leading-relaxed max-w-xs lg:text-right">
+              Fullstack engineering meets<br />cinematic motion design.
+            </p>
+          </div>
+        </motion.div>
       </div>
-      <SelectedWorks />
-      
-      <div style={{ height: '600px', position: 'relative' }}>
-        <FlowingMenu 
-          items={demoItems}
-          speed={15}
-          textColor="#ffffff"
-          bgColor="#060010"
-          marqueeBgColor="#ffffff"
-          marqueeTextColor="#060010"
-          borderColor="#ffffff"
-        />
-      </div>
+      {/* Showcase section fills the rest — has its own padding, tabs, cards */}
+      <Showcase hideHeader />
     </motion.main>
   );
 }
@@ -202,19 +191,28 @@ function StickyCTA() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <AnimatePresence>
       {show && (
-        <motion.a
-          href="#contact"
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 100 }}
-          transition={{ duration: 0.5 }}
-          className="fixed bottom-48 right-8 z-50 px-6 py-3 bg-primary text-white font-bold rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-transform hidden md:flex items-center gap-2"
-        >
-          Hire Me <span className="text-xl leading-none">&rarr;</span>
-        </motion.a>
+          <motion.a
+            href="#contact"
+            onClick={handleClick}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            transition={{ duration: 0.5 }}
+            className="fixed bottom-32 right-8 z-[60] px-8 py-3.5 bg-[#a78bfa] text-[#060010] font-black tracking-widest uppercase rounded-full shadow-[0_0_30px_rgba(167,139,250,0.5)] hover:bg-white hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.7)] transition-all hidden md:flex items-center gap-2"
+          >
+            Hire Me <span className="text-xl leading-none">&rarr;</span>
+          </motion.a>
       )}
     </AnimatePresence>
   );

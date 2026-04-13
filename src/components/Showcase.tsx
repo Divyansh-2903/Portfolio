@@ -452,7 +452,7 @@ const tabs: { key: Category; label: string; icon: React.ReactNode }[] = [
 ];
 
 /* ─── Export ─────────────────────────────────────────── */
-export default function Showcase() {
+export default function Showcase({ hideHeader = false }: { hideHeader?: boolean }) {
   const [active, setActive] = useState<Category>('fullstack');
   const headerRef = useRef<HTMLDivElement>(null);
   const headerInView = useInView(headerRef, { once: true, margin: '-80px' });
@@ -479,6 +479,7 @@ export default function Showcase() {
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 relative z-10">
         {/* ── Section Header ── */}
+        {!hideHeader && (
         <motion.div
           ref={headerRef}
           initial={{ opacity: 0, y: 40 }}
@@ -532,6 +533,39 @@ export default function Showcase() {
             </div>
           </div>
         </motion.div>
+        )}
+
+        {/* Tab switcher shown separately when header is hidden */}
+        {hideHeader && (
+          <div className="flex items-center justify-between mb-10">
+            <div
+              className="flex items-center gap-1 p-1 rounded-full"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            >
+              {tabs.map((tab) => (
+                <motion.button
+                  key={tab.key}
+                  onClick={() => setActive(tab.key)}
+                  className="relative flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-mono uppercase tracking-widest transition-colors duration-300"
+                  style={{ color: active === tab.key ? '#080808' : 'rgba(255,255,255,0.45)' }}
+                >
+                  {active === tab.key && (
+                    <motion.div
+                      layoutId="tab-indicator-2"
+                      className="absolute inset-0 rounded-full"
+                      style={{ background: 'oklch(0.75 0.18 280)' }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-2">
+                    {tab.icon}
+                    {tab.label}
+                  </span>
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ── Projects Grid ── */}
         <AnimatePresence mode="wait">

@@ -64,13 +64,13 @@ export default function Hero() {
            variants={fadeUp}
            className="flex flex-col items-center gap-4 mb-6 pointer-events-auto"
         >
-          <div className="flex flex-wrap items-baseline justify-center gap-2">
-            <span className="font-display text-xl md:text-2xl lg:text-3xl text-white uppercase tracking-tight drop-shadow-md">
+          <motion.div layout className="flex flex-wrap items-baseline justify-center w-full text-center">
+            <motion.span layout className="font-display text-xl md:text-2xl lg:text-3xl text-white uppercase tracking-tight drop-shadow-md pr-3">
               Crafting Digital Experiences for
-            </span>
+            </motion.span>
             <RotatingText
               texts={['Startups', 'Founders', 'Brands', 'Creators', 'Dreamers']}
-              mainClassName="w-[130px] sm:w-[150px] md:w-[180px] lg:w-[210px] inline-flex font-display text-xl md:text-2xl lg:text-3xl uppercase tracking-tight text-purple-300 whitespace-nowrap drop-shadow-[0_0_20px_rgba(216,180,254,0.5)]"
+              mainClassName="inline-flex justify-start font-display text-xl md:text-2xl lg:text-3xl uppercase tracking-tight text-purple-300 whitespace-nowrap drop-shadow-[0_0_20px_rgba(216,180,254,0.5)]"
               staggerFrom="first"
               initial={{ opacity: 0, filter: 'blur(4px)' }}
               animate={{ opacity: 1, filter: 'blur(0px)' }}
@@ -80,7 +80,7 @@ export default function Hero() {
               transition={{ type: 'tween', duration: 0.1 }}
               rotationInterval={3000}
             />
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* Headline */}

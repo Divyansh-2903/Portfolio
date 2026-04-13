@@ -39,13 +39,13 @@ export default function GlobalElements() {
     <>
       {/* Scroll Progress Bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-primary origin-left z-[100]"
+        className="fixed top-0 left-0 right-0 h-1 bg-primary origin-left z-[150]"
         style={{ scaleX }}
       />
 
       {/* Custom Cursor */}
       <motion.div
-        className="fixed top-0 left-0 w-4 h-4 rounded-full bg-primary pointer-events-none z-[100] mix-blend-screen"
+        className="fixed top-0 left-0 w-4 h-4 rounded-full bg-primary pointer-events-none z-[200] mix-blend-screen"
         animate={{
           x: mousePosition.x - 8,
           y: mousePosition.y - 8,

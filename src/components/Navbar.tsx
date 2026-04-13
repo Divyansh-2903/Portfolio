@@ -3,11 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { useLenis } from 'lenis/react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const lenis = useLenis();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,9 +21,10 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: 'Work', href: '/work' },
-    { name: 'About', href: '/about' },
-    { name: 'Contact', href: '/#contact' },
+    { name: 'Home',    href: '/'        },
+    { name: 'Work',    href: '/work'    },
+    { name: 'About',   href: '/about'   },
+    { name: 'Contact', href: '/#contact'},
   ];
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -29,8 +33,17 @@ export default function Navbar() {
     
     // If it's a hash link (e.g. #contact), scroll to it if on Home
     if (href.startsWith('/#')) {
-      if (window.location.pathname !== '/') {
-        window.location.href = href;
+      if (location.pathname !== '/') {
+        navigate('/');
+        setTimeout(() => {
+          // lenis scroll to won't work immediately after navigate since DOM might need a tick
+          const id = href.substring(1); // #contact
+          if (lenis) {
+            lenis.scrollTo(id, { offset: -80 });
+          } else {
+            document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 200);
       } else {
         const id = href.substring(1);
         if (lenis) {
@@ -40,14 +53,14 @@ export default function Navbar() {
         }
       }
     } else if (href === '/') {
-      if (window.location.pathname === '/') {
+      if (location.pathname === '/') {
         if (lenis) lenis.scrollTo(0, { offset: -80 });
         else window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-         window.location.href = href;
+         navigate(href);
       }
     } else {
-      window.location.href = href;
+      navigate(href);
     }
   };
 

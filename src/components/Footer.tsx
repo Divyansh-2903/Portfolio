@@ -1,127 +1,166 @@
 import { motion } from 'framer-motion';
-import Marquee from 'react-fast-marquee';
-import { Mail, Phone } from 'lucide-react';
+import _Marquee from 'react-fast-marquee';
+const Marquee = (_Marquee as any).default || _Marquee;
+import { Mail, Phone, Github, Linkedin, MessageCircle } from 'lucide-react';
+import { useState } from 'react';
 
+/* ─── Social Icon ───────────────────────────────────────── */
+function SocialIcon({
+  href, icon: Icon, label, color,
+}: { href: string; icon: React.FC<{ size?: number }>; label: string; color: string }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <motion.a
+      href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+      whileHover={{ y: -3 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300"
+      style={{
+        background: hovered ? `${color}18` : 'rgba(255,255,255,0.04)',
+        border: `1px solid ${hovered ? color + '45' : 'rgba(255,255,255,0.07)'}`,
+        color: hovered ? color : 'rgba(255,255,255,0.3)',
+        boxShadow: hovered ? `0 0 18px ${color}25` : 'none',
+      }}
+    >
+      <Icon size={15} />
+    </motion.a>
+  );
+}
 
+/* ─── Footer ─────────────────────────────────────────────── */
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
+  const year = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden bg-bg border-t border-white/10">
+    <footer className="relative z-50 overflow-hidden bg-bg">
 
-      {/* ── "Let's work together" marquee strip ─────────────── */}
-      <div className="border-b border-white/10 py-5 overflow-hidden">
-        <Marquee
-          gradient={false}
-          speed={60}
-          autoFill
-          className="overflow-hidden"
-        >
-          <span className="text-4xl sm:text-5xl md:text-6xl font-display font-black uppercase tracking-tight text-white/10 select-none px-6">
-            Let's work together
+      {/* ── Gradient backdrop ── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-16 left-1/3 w-[600px] h-[400px] rounded-full"
+          style={{ background: 'radial-gradient(circle, #a78bfa10 0%, transparent 60%)', filter: 'blur(80px)' }} />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[350px] rounded-full"
+          style={{ background: 'radial-gradient(circle, #818cf812 0%, transparent 60%)', filter: 'blur(70px)' }} />
+      </div>
+
+      {/* ── Top border accent ── */}
+      <div className="absolute top-0 left-0 right-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent 0%, #a78bfa40 35%, #818cf840 65%, transparent 100%)' }} />
+
+      {/* ── Marquee ── */}
+      <div className="relative border-b overflow-hidden py-5" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+        {/* Fade edges */}
+        <div className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+          style={{ background: 'linear-gradient(90deg, var(--color-bg, #09091a), transparent)' }} />
+        <div className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+          style={{ background: 'linear-gradient(-90deg, var(--color-bg, #09091a), transparent)' }} />
+
+        <Marquee gradient={false} speed={50} autoFill className="overflow-hidden">
+          <span
+            className="font-display font-black uppercase tracking-tight select-none px-6 text-5xl sm:text-6xl"
+            style={{
+              background: 'linear-gradient(135deg, rgba(167,139,250,0.22) 0%, rgba(129,140,248,0.18) 50%, rgba(167,139,250,0.22) 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            LET'S WORK TOGETHER
           </span>
-          <span className="text-4xl sm:text-5xl md:text-6xl font-display font-black text-primary/30 select-none px-4">
-            ✳
-          </span>
+          <span className="text-4xl select-none px-4" style={{ color: 'rgba(167,139,250,0.2)' }}>✳</span>
         </Marquee>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-16 md:py-24">
-        <div className="flex flex-col items-center justify-center gap-10">
+      {/* ── Body ── */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-24 pt-16 pb-10">
 
-          {/* ── Full Name (large) ──────────────────────────── */}
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="text-5xl sm:text-7xl md:text-[110px] font-display uppercase tracking-tighter text-white/10 select-none text-center leading-none"
-          >
-            Divyansh&nbsp;Saxena
-          </motion.h2>
+        {/* Large ghosted name */}
+        <motion.h2
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="font-display font-black uppercase leading-none select-none tracking-tighter text-center mb-10"
+          style={{
+            fontSize: 'clamp(3.5rem, 12vw, 10rem)',
+            background: 'linear-gradient(135deg, rgba(167,139,250,0.14) 0%, rgba(255,255,255,0.06) 40%, rgba(129,140,248,0.12) 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          Divyansh&nbsp;Saxena
+        </motion.h2>
 
-          {/* ── Availability Badge ─────────────────────────── */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="relative inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/10 bg-surface/50 backdrop-blur-md"
+        {/* Availability + contact row */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          className="flex flex-col items-center gap-5 mb-12"
+        >
+          {/* Availability badge */}
+          <div
+            className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full"
+            style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)' }}
           >
-            <span className="relative z-10 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
             </span>
-            <span className="relative z-10 text-sm font-mono text-text-secondary">
-              Currently open to freelance — Updated {currentYear}
-            </span>
-          </motion.div>
-
-          {/* ── Contact Info ───────────────────────────────── */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10"
-          >
-            <a
-              href="mailto:divyanshsaxena2903@gmail.com"
-              className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors duration-200 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg rounded"
-            >
-              <Mail size={16} className="text-primary" />
-              divyanshsaxena2903@gmail.com
-            </a>
-            <span className="hidden sm:block w-px h-5 bg-white/10" />
-            <a
-              href="tel:+918302506868"
-              className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors duration-200 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg rounded"
-            >
-              <Phone size={16} className="text-primary" />
-              +91 83025 06868
-            </a>
-          </motion.div>
-
-          {/* ── Bottom Bar ─────────────────────────────────── */}
-          <div className="w-full flex flex-col md:flex-row items-center justify-between gap-6 pt-10 border-t border-white/5 mt-4">
-            <p className="text-xs font-mono text-text-secondary">
-              &copy; {currentYear} Divyansh Saxena. All rights reserved.
-            </p>
-
-            <div className="flex items-center gap-6">
-              <a
-                href="#work"
-                className="text-xs font-mono text-text-secondary hover:text-primary transition-colors duration-200"
-              >
-                Work
-              </a>
-              <a
-                href="#about"
-                className="text-xs font-mono text-text-secondary hover:text-primary transition-colors duration-200"
-              >
-                About
-              </a>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-mono text-text-secondary hover:text-primary transition-colors duration-200"
-              >
-                GitHub
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-mono text-text-secondary hover:text-primary transition-colors duration-200"
-              >
-                LinkedIn
-              </a>
-            </div>
+            <span className="font-mono text-xs text-green-400/60 tracking-wide">Currently open to freelance — Updated {year}</span>
           </div>
 
-        </div>
+          {/* Contact links */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
+            <a href="mailto:divyanshsaxena2903@gmail.com"
+              className="flex items-center gap-2 font-mono text-xs text-white/30 hover:text-primary transition-colors duration-200">
+              <Mail size={13} className="text-primary/50" />
+              divyanshsaxena2903@gmail.com
+            </a>
+            <span className="hidden sm:block w-px h-4 bg-white/08" />
+            <a href="tel:+918302506868"
+              className="flex items-center gap-2 font-mono text-xs text-white/30 hover:text-primary transition-colors duration-200">
+              <Phone size={13} className="text-primary/50" />
+              +91 83025 06868
+            </a>
+          </div>
+        </motion.div>
+
+        {/* Divider */}
+        <div className="h-px w-full mb-8"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(167,139,250,0.15), transparent)' }} />
+
+        {/* Bottom bar */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
+          <p className="font-mono text-[11px] text-white/18 tracking-widest uppercase">
+            © {year} Divyansh Saxena · All rights reserved.
+          </p>
+
+          <div className="flex items-center gap-2">
+            <SocialIcon href="https://github.com/Divyansh-2903" icon={Github} label="GitHub" color="#e2e8f0" />
+            <SocialIcon href="https://linkedin.com" icon={Linkedin} label="LinkedIn" color="#0A66C2" />
+            <SocialIcon href="mailto:divyanshsaxena2903@gmail.com" icon={Mail} label="Email" color="#a78bfa" />
+            <SocialIcon href="https://wa.me/918302506868" icon={MessageCircle} label="WhatsApp" color="#25D366" />
+          </div>
+
+          <a href="#hero"
+            className="font-mono text-[11px] uppercase tracking-widest text-white/18 hover:text-primary/60 transition-colors duration-300">
+            ↑ Back to top
+          </a>
+        </motion.div>
       </div>
+
+      {/* ── Bottom glow edge ── */}
+      <div className="absolute bottom-0 left-0 right-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, oklch(0.75 0.18 280 / 0.25), transparent)' }} />
     </footer>
   );
 }

@@ -7,18 +7,32 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  /* 1. Core Colors */
   --color-bg: #080808;
-  --color-surface: #111111;
-  --color-primary: #A78BFA;
-  --color-glow: #A78BFA33;
+  --color-surface: oklch(100% 0 0 / 5%);
+  --color-primary: oklch(0.75 0.18 280); /* Vibrant Purple */
+  --color-brand-glow: oklch(0.75 0.18 280 / 0.4);
+  --color-glow: var(--color-brand-glow);
+  
   --color-text-primary: #F5F5F5;
   --color-text-secondary: #888888;
   --color-success: #22C55E;
 
+  /* 2. Fonts */
   --font-display: "Bebas Neue", sans-serif;
   --font-body: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   --font-numbers: "Space Grotesk", sans-serif;
+
+  /* 3. Glow System */
+  --shadow-glow-sm: 0 0 15px var(--color-brand-glow);
+  --shadow-glow-md: 0 0 30px var(--color-brand-glow);
+  --shadow-glow-lg: 0 0 50px var(--color-brand-glow);
+  
+  --drop-shadow-glow-md: 0 0 30px var(--color-brand-glow);
+
+  /* 4. Motion Tokens */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Force background to fill entire viewport — outside any layer so it wins */
@@ -160,7 +174,7 @@ body {
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #A78BFA;
+  --primary: oklch(0.75 0.18 280);
   --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -195,7 +209,7 @@ body {
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: #A78BFA;
+  --primary: oklch(0.75 0.18 280);
   --primary-foreground: #ffffff;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);

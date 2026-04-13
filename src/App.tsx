@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type {} from 'framer-motion'; // keep tree-shaking clean
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 // Components
@@ -15,10 +16,11 @@ import Hero from './components/Hero';
 import Services from './components/Services';
 import SelectedWorks from './components/SelectedWorks';
 import BentoGrid from './components/BentoGrid';
-import FAQ from './components/FAQ';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Story from './components/Story';
+import Showcase from './components/Showcase';
+import Testimonials from './components/Testimonials';
 import GradualBlur from './components/GradualBlur';
 
 import FlowingMenu from './components/FlowingMenu';
@@ -42,8 +44,8 @@ const Home: React.FC = () => {
     >
       <Hero />
       <Story />
-      <SelectedWorks />
-      <FAQ />
+      <Showcase />
+      <Testimonials />
       <Contact />
     </motion.main>
   );
@@ -181,7 +183,7 @@ function AppContent() {
           {/* Sticky "Available" CTA */}
           <StickyCTA />
 
-          <ScrollDependentBlur />
+          <GlobalVignette />
         </>
       )}
     </>
@@ -218,46 +220,50 @@ function StickyCTA() {
   );
 }
 
-function ScrollDependentBlur() {
-  const [opacity, setOpacity] = useState(0);
+/** Global cinematic vignette.
+ *
+ *  Bottom blur is hidden in two "release" zones:
+ *   1. Hero zone   — scrollY < 380px  (keeps CTA buttons sharp)
+ *   2. Footer zone — within 420px of page bottom (keeps footer sharp)
+ *
+ *  We mount/unmount GradualBlur (boolean toggle) instead of animating
+ *  opacity so that we never create a compositing layer that breaks
+ *  backdrop-filter.
+ */
+function GlobalVignette() {
+  const [showBlur, setShowBlur] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Start fading in after scrolling half of viewport, full opacity at 1 full viewport height
-      const y = window.scrollY;
-      const startFade = window.innerHeight * 0.5;
-      const endFade = window.innerHeight;
-      
-      if (y <= startFade) {
-        setOpacity(0);
-      } else if (y >= endFade) {
-        setOpacity(1);
-      } else {
-        setOpacity((y - startFade) / (endFade - startFade));
-      }
+    const update = () => {
+      const scrollY   = window.scrollY;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const inHero   = scrollY < 380;
+      const inFooter = maxScroll - scrollY < 420;
+      setShowBlur(!inHero && !inFooter);
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    return () => window.removeEventListener('scroll', update);
   }, []);
 
   return (
-    <div 
-      className="fixed inset-x-0 bottom-0 h-[7rem] pointer-events-none" 
-      style={{ opacity, zIndex: 40, transition: 'opacity 0.1s linear' }}
-    >
-      <GradualBlur
-        target="parent"
-        position="bottom"
-        height="7rem"
-        strength={2}
-        divCount={6}
-        curve="bezier"
-        exponential
-        opacity={1}
-        zIndex={0}
+    <>
+      {/* ── Top edge: CSS gradient, always visible ── */}
+      <div
+        className="fixed inset-x-0 top-0 pointer-events-none"
+        style={{
+          height: '7rem',
+          background: 'linear-gradient(to bottom, rgba(6,0,16,0.92) 0%, rgba(6,0,16,0.5) 55%, transparent 100%)',
+          zIndex: 40,
+        }}
       />
-    </div>
+
+      {/* ── Bottom blur: shown only between hero and footer zones ── */}
+      {showBlur && (
+        <GradualBlur position="bottom" height="5rem" strength={7} layers={9} zIndex={40} />
+      )}
+    </>
   );
 }
 

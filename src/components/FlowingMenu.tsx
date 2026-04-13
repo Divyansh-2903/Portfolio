@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Marquee from 'react-fast-marquee';
+import _Marquee from 'react-fast-marquee';
+const Marquee = (_Marquee as any).default || _Marquee;
 
 interface MenuItem {
   link: string;

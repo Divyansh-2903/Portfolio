@@ -12,6 +12,8 @@ const Navbar = React.memo(function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [activePath, setActivePath] = useState(location.pathname + location.hash || '/');
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -19,6 +21,10 @@ const Navbar = React.memo(function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    setActivePath(location.pathname + location.hash || '/');
+  }, [location]);
 
   const navLinks = [
     { name: 'Home',    href: '/'        },
@@ -30,6 +36,7 @@ const Navbar = React.memo(function Navbar() {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setMobileMenuOpen(false);
+    setActivePath(href);
     
     // Hash link handling (e.g. #contact)
     if (href.startsWith('/#')) {
@@ -83,16 +90,28 @@ const Navbar = React.memo(function Navbar() {
 
           {/* Desktop Links (Pill Container) */}
           <div className="hidden md:flex items-center gap-1 bg-[#080808]/60 backdrop-blur-lg border border-white/10 rounded-full p-1 relative z-10">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className="text-sm font-medium text-white hover:text-white/80 px-5 py-2 rounded-full hover:bg-white/10 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-black relative z-10"
-              >
-                {link.name}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = activePath === link.href;
+              return (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className={`relative z-10 text-sm font-medium px-5 py-2 rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-black ${
+                    isActive ? 'text-black' : 'text-white hover:text-white/80 hover:bg-white/10'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="nav-pill"
+                      className="absolute inset-0 bg-white rounded-full -z-10"
+                      transition={{ type: "spring", stiffness: 450, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">{link.name}</span>
+                </a>
+              );
+            })}
           </div>
 
           {/* Right Side Controls */}

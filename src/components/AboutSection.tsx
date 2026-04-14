@@ -1,60 +1,115 @@
 import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { Palette, Cpu, ExternalLink, Code2, Database, Layers, Terminal, PenTool, LayoutTemplate, Sparkles, Server } from 'lucide-react';
-import { projects } from './Showcase';
+import { Palette, Cpu, ExternalLink, BrainCircuit } from 'lucide-react';
+import { SiNextdotjs, SiTypescript, SiSupabase, SiTailwindcss, SiFigma, SiNodedotjs, SiReact, SiFramer, SiAnthropic } from 'react-icons/si';
+import { TbBrandOpenai } from 'react-icons/tb';
+import { projects } from '../data/projects';
+import { client, urlFor } from '../lib/sanity';
+
+// Dynamic Icon Mapping (for Sanity-driven cards)
+const iconMap: Record<string, any> = {
+  Palette, Cpu, ExternalLink
+};
 
 
-const timelineItems = [
+const DEFAULT_TIMELINE = [
   {
     period: '2025 — Present',
-    role: 'Lead Fullstack Engineer',
-    company: 'Digital Agency',
-    desc: 'Led a team of developers to build scalable SaaS platforms and complex data ecosystems. Delivered end-to-end cinematic web experiences for enterprise clients using Next.js and Supabase.',
+    role: 'Founder',
+    company: 'Syntax & OneClipHub',
+    desc: 'Syntax: Established a parent company to serve as an incubator for scalable digital products and AI-driven tools.\nOneClipHub: Developed and launched a unified media downloader platform, managing the full lifecycle from UI/UX design to deployment.\n\nTech Stack: Transitioned into Full-Stack development, integrating Python and modern web frameworks into the product lineup.',
   },
   {
-    period: '2024 — 2025',
-    role: 'Freelance Architect',
-    company: 'Independent',
-    desc: 'Built 20+ custom applications ranging from cinematic portfolios to robust e-commerce solutions. Focused on bridging the gap between high-fidelity design and rigorous technical execution.',
+    period: '2024 — Present',
+    role: 'Founder',
+    company: '@grindxgrowth',
+    desc: 'Built a digital brand focused on high-performance growth and "scroll-stopping" visual storytelling.\n\nMilestone: Successfully generated 140,000+ total views, validating a data-driven approach to content hooks and audience retention.',
   },
   {
-    period: '2023 — 2024',
-    role: 'Frontend Developer',
-    company: 'Tech Startup',
-    desc: 'Engineered high-performance dashboards and interactive UI components. Pioneered frontend optimization strategies that boosted overall platform loading speed by 40%.',
-  },
-  {
-    period: '2022 — 2023',
-    role: 'Creative Designer',
-    company: 'Studio',
-    desc: 'Established foundational brand identities and motion graphics reels. Developed comprehensive UI/UX design systems before fully transitioning into software engineering.',
+    period: '2023 — 2025',
+    role: 'Freelance Video Editor & Motion Designer',
+    company: 'Design & Media',
+    desc: 'Herbalife (2024): Executed a 3-month specialized video editing contract for the CFO of Herbalife, focusing on high-level corporate communication.\nSunny Biggy Fitness: Delivered a high-energy media project tailored for fitness industry engagement.\n\nGeneral Freelance: Provided 2 years of premium motion graphics and video editing services, specializing in "cinematic" aesthetics for diverse clients.',
   },
 ];
 
-const toolkitItems = [
-  { name: 'Next.js & React', category: 'Engineering', Icon: Code2 },
-  { name: 'TypeScript',      category: 'Language',    Icon: Terminal },
-  { name: 'Supabase',        category: 'Backend',     Icon: Database },
-  { name: 'Tailwind CSS',    category: 'Styling',     Icon: LayoutTemplate },
-  { name: 'Cursor & AI',     category: 'Workflow',    Icon: Sparkles },
-  { name: 'Framer Motion',   category: 'Animation',   Icon: Layers },
-  { name: 'Figma',           category: 'Design',      Icon: PenTool },
-  { name: 'Node.js',         category: 'Server',      Icon: Server },
+
+// Custom SVG Icons for brands missing from Si library
+const PhotoshopIcon = ({ className, size = 24 }: { className?: string; size?: number | string }) => (
+  <img 
+    src="/assets/photoshop.svg" 
+    alt="Photoshop" 
+    className={`${className} object-contain block`} 
+    style={{ width: size, height: size }} 
+  />
+);
+
+const PremiereIcon = ({ className, size = 24 }: { className?: string; size?: number | string }) => (
+  <img 
+    src="/assets/premiere.svg" 
+    alt="Premiere Pro" 
+    className={`${className} object-contain block`} 
+    style={{ width: size, height: size }} 
+  />
+);
+
+const AfterEffectsIcon = ({ className, size = 24 }: { className?: string; size?: number | string }) => (
+  <img 
+    src="/assets/aftereffects.svg" 
+    alt="After Effects" 
+    className={`${className} object-contain block`} 
+    style={{ width: size, height: size }} 
+  />
+);
+
+const ClaudeIcon = ({ className, size = 24 }: { className?: string; size?: number | string }) => (
+  <img 
+    src="/assets/claude.svg" 
+    alt="Claude" 
+    className={`${className} object-contain block`} 
+    style={{ width: size, height: size }} 
+  />
+);
+
+const AntigravityIcon = ({ className, size = 24 }: { className?: string; size?: number | string }) => (
+  <img 
+    src="/assets/antigravity.svg" 
+    alt="Antigravity" 
+    className={`${className} object-contain block`} 
+    style={{ width: size, height: size }} 
+  />
+);
+
+// Static toolkit with real brand icons + colors (not driven by Sanity)
+const TOOLKIT_ITEMS = [
+  { name: 'Next.js',      category: 'Framework',   Icon: SiNextdotjs,  color: '#ffffff' },
+  { name: 'React',        category: 'UI Library',  Icon: SiReact,      color: '#61dafb' },
+  { name: 'TypeScript',   category: 'Language',    Icon: SiTypescript, color: '#3178c6' },
+  { name: 'Supabase',     category: 'Backend',     Icon: SiSupabase,   color: '#3ecf8e' },
+  { name: 'Tailwind CSS', category: 'Styling',     Icon: SiTailwindcss,color: '#38bdf8' },
+  { name: 'Framer Motion',category: 'Animation',   Icon: SiFramer,     color: '#dd2aff' },
+  { name: 'Figma',        category: 'Design',      Icon: SiFigma,      color: '#f24e1e' },
+  { name: 'Node.js',      category: 'Runtime',     Icon: SiNodedotjs,  color: '#84cc16' },
+  { name: 'Photoshop',    category: 'Graphics',    Icon: PhotoshopIcon, color: '#31A8FF' },
+  { name: 'Premiere Pro', category: 'Video Edit',  Icon: PremiereIcon, color: '#9999FF' },
+  { name: 'After Effects',category: 'Motion Design',Icon: AfterEffectsIcon, color: '#CF96FD' },
+  { name: 'Claude',       category: 'AI Assistant',Icon: ClaudeIcon, color: '#D97757' },
+  { name: 'Antigravity',  category: 'Agentic AI',  Icon: AntigravityIcon, color: '#6366f1' },
 ];
 
 /* ─── Design DNA Cards ──────────────────────────────────────── */
-const designCards = [
+const DEFAULT_DESIGN_CARDS = [
   {
     num: 'G1', tag: 'THE INSTINCT', accent: '#a78bfa',
     gradient: 'linear-gradient(135deg, #1a0533 0%, #0d0122 40%, #1d0845 100%)',
-    Icon: Palette,
+    iconName: 'Palette',
     title: 'ATMOSPHERIC AESTHETICS',
     body: 'Cinematic over corporate. I design for the pause — that split second where someone stops scrolling because something felt different. That reaction is the whole point.',
   },
   {
     num: 'G2', tag: 'THE SPINE', accent: '#818cf8',
     gradient: 'linear-gradient(135deg, #0f1744 0%, #080d2b 60%, #0c1a3f 100%)',
-    Icon: Cpu,
+    iconName: 'Cpu',
     title: 'PRECISION ENGINEERING',
     body: "Clean architecture isn't invisible — it's what makes everything else possible. From backend logic to frame-perfect motion, I build the parts people never see so the parts they do feel effortless.",
   },
@@ -143,6 +198,35 @@ export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerInView = useInView(sectionRef, { once: true, margin: '-80px' });
 
+  const [aboutData, setAboutData] = React.useState<any>({
+    name: "DIVYANSH SAXENA",
+    subtext: "Fullstack Developer · UI/UX Designer\nMotion Graphics · Creative Engineer",
+    philosophyHeadline: "I DON'T MAKE THINGS LOOK GOOD. I MAKE THEM FEEL INEVITABLE.",
+    philosophyBody: "Every project I touch is a decision about what the internet should feel like. Deliberate, precise, and impossible to ignore.",
+    isAvailable: true,
+    locationLabel: "Creative Developer · Jaipur, India",
+    designCards: DEFAULT_DESIGN_CARDS,
+    timelineItems: DEFAULT_TIMELINE,
+    toolkitItems: TOOLKIT_ITEMS,
+  });
+
+  React.useEffect(() => {
+    async function fetchAbout() {
+      try {
+        const data = await client.fetch(`*[_type == "about"][0]`);
+        if (data) {
+          setAboutData((prev: any) => ({
+            ...prev,
+            ...data
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to fetch about data:", err);
+      }
+    }
+    fetchAbout();
+  }, []);
+
   const dynamicStats = React.useMemo(() => {
     const uniqueCategories = new Set(projects.map(p => p.category)).size;
     const allTech = projects.flatMap(p => p.tech);
@@ -194,14 +278,13 @@ export default function AboutSection() {
           </div>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
             <h1 className="font-display text-[clamp(3.5rem,10vw,9rem)] uppercase tracking-[0.02em] leading-[0.85] text-white">
-              DIVYANSH{' '}
+              {aboutData.name?.split(' ')[0] || 'DIVYANSH'}{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-300 to-indigo-300">
-                SAXENA
+                {aboutData.name?.split(' ').slice(1).join(' ') || 'SAXENA'}
               </span>
             </h1>
-            <p className="text-white/35 font-mono text-sm leading-relaxed max-w-xs lg:text-right">
-              Fullstack Developer · UI/UX Designer<br />
-              Motion Graphics · Creative Engineer
+            <p className="text-white/35 font-mono text-sm leading-relaxed max-w-xs lg:text-right whitespace-pre-line">
+              {aboutData.subtext}
             </p>
           </div>
         </motion.div>
@@ -232,24 +315,26 @@ export default function AboutSection() {
                 </span>
                 <div>
                   <p className="font-display text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight text-white leading-[1.05] mb-8">
-                    I DON'T MAKE THINGS LOOK GOOD.{' '}
+                    {aboutData.philosophyHeadline.split('.')[0]}.{' '}
                     <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-300 to-indigo-300">
-                      I MAKE THEM FEEL INEVITABLE.
+                      {aboutData.philosophyHeadline.split('.').slice(1).join('.').trim()}
                     </span>
                   </p>
                   <p className="text-white/40 font-body text-base leading-relaxed max-w-lg">
-                    Every project I touch is a decision about what the internet should feel like. Deliberate, precise, and impossible to ignore.
+                    {aboutData.philosophyBody}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 mt-10 pt-8"
                   style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                   <span className="font-mono text-[10px] text-white/25 uppercase tracking-widest">
-                    Available for projects
+                    {aboutData.isAvailable ? 'Available for projects' : 'Currently Unavailable'}
                   </span>
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
-                  </span>
+                  {aboutData.isAvailable && (
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
+                    </span>
+                  )}
                 </div>
               </div>
             </GlareCard>
@@ -269,15 +354,15 @@ export default function AboutSection() {
             >
               <div className="relative min-h-[580px] overflow-hidden rounded-3xl">
                 <img
-                  src="/assets/divyansh.jpg"
-                  alt="Divyansh Saxena — Creative Developer"
+                  src={aboutData.portraitImage ? urlFor(aboutData.portraitImage).width(800).url() : "/assets/divyansh.jpg"}
+                  alt={aboutData.name}
                   className="absolute inset-0 w-full h-full object-cover"
                   style={{ objectPosition: 'center 10%' }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0e0526cc] via-transparent to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-8">
-                  <p className="font-mono text-xs text-primary uppercase tracking-widest mb-1">Divyansh Saxena</p>
-                  <p className="font-mono text-[10px] text-white/40 tracking-wider">Creative Developer · Jaipur, India</p>
+                  <p className="font-mono text-xs text-primary uppercase tracking-widest mb-1">{aboutData.name || 'Divyansh Saxena'}</p>
+                  <p className="font-mono text-[10px] text-white/40 tracking-wider">{aboutData.locationLabel}</p>
                 </div>
                 <div className="absolute top-6 right-6 px-3 py-1.5 rounded-full"
                   style={{ background: 'rgba(192,132,252,0.15)', border: '1px solid rgba(192,132,252,0.3)', backdropFilter: 'blur(8px)' }}>
@@ -290,13 +375,91 @@ export default function AboutSection() {
           </motion.div>
         </div>
 
-        {/* ── The Pulse (Metrics) ── */}
+        {/* ── Design DNA Cards ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {aboutData.designCards.map((col: any, i: number) => {
+            const IconComponent = iconMap[col.iconName] || ExternalLink;
+            return (
+              <motion.div
+                key={col.num || i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <GlareCard gradient={col.gradient} accentColor={col.accent} className="h-full">
+                  <div className="p-8 flex flex-col h-full min-h-[220px]">
+                    <div className="flex items-center justify-between mb-6">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.25em]" style={{ color: col.accent }}>
+                        {col.num} // {col.tag}
+                      </span>
+                      <div
+                        className="w-8 h-8 rounded-xl flex items-center justify-center"
+                        style={{ background: `${col.accent}15`, border: `1px solid ${col.accent}30` }}
+                      >
+                        <IconComponent size={14} style={{ color: col.accent }} />
+                      </div>
+                    </div>
+                    <h3 className="font-display text-2xl uppercase tracking-tight text-white mb-4">{col.title}</h3>
+                    <p className="text-white/45 text-sm leading-relaxed font-body flex-1">{col.body}</p>
+                  </div>
+                </GlareCard>
+              </motion.div>
+            )
+          })}
+        </div>
+
+        {/* ── Work Timeline ── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="mb-6"
+        >
+          <div className="flex items-center gap-4 mb-10">
+            <span className="font-mono text-[10px] text-primary uppercase tracking-[0.3em]">// Career History</span>
+            <div className="h-px bg-white/10 flex-1" />
+          </div>
+
+          <div className="flex flex-col">
+            {aboutData.timelineItems.map((item: any, i: number) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="group relative flex flex-col md:flex-row md:items-baseline justify-between py-10 gap-4 md:gap-12"
+                style={{
+                  borderTop: i === 0 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                  borderBottom: '1px solid rgba(255,255,255,0.05)',
+                }}
+              >
+                <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary scale-y-0 origin-top group-hover:scale-y-100 transition-transform duration-500 ease-out" />
+                <div className="md:w-1/4 shrink-0 px-4 md:px-6">
+                  <span className="font-mono text-xs text-white/40 tracking-widest">{item.period}</span>
+                </div>
+                <div className="md:w-3/4 flex flex-col gap-3 px-4 md:px-0 pr-4 md:pr-8">
+                  <h4 className="font-display text-2xl md:text-3xl uppercase tracking-tight text-white group-hover:text-primary transition-colors duration-300">
+                    {item.role} <span className="text-white/20 px-2">|</span> <span className="text-white/60">{item.company}</span>
+                  </h4>
+                  <p className="text-white/50 text-sm md:text-base leading-relaxed font-body max-w-2xl">
+                    {item.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ── The Pulse (Metrics) — below timeline ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-16"
         >
           <GlareCard
             gradient="linear-gradient(135deg, #1e0b3e 0%, #0e0526 40%, #1a0840 100%)"
@@ -327,135 +490,13 @@ export default function AboutSection() {
           </GlareCard>
         </motion.div>
 
-        {/* ── Design DNA Cards (2 cards, arsenal removed) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {designCards.map((col, i) => (
-            <motion.div
-              key={col.num}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <GlareCard gradient={col.gradient} accentColor={col.accent} className="h-full">
-                <div className="p-8 flex flex-col h-full min-h-[220px]">
-                  <div className="flex items-center justify-between mb-6">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.25em]" style={{ color: col.accent }}>
-                      {col.num} // {col.tag}
-                    </span>
-                    <div
-                      className="w-8 h-8 rounded-xl flex items-center justify-center"
-                      style={{ background: `${col.accent}15`, border: `1px solid ${col.accent}30` }}
-                    >
-                      <col.Icon size={14} style={{ color: col.accent }} />
-                    </div>
-                  </div>
-                  <h3 className="font-display text-2xl uppercase tracking-tight text-white mb-4">{col.title}</h3>
-                  <p className="text-white/45 text-sm leading-relaxed font-body flex-1">{col.body}</p>
-                </div>
-              </GlareCard>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* ── Work Timeline ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-16"
-        >
-          <div className="flex items-center gap-4 mb-10">
-            <span className="font-mono text-[10px] text-primary uppercase tracking-[0.3em]">// Career History</span>
-            <div className="h-px bg-white/10 flex-1" />
-          </div>
-
-          <div className="flex flex-col">
-            {timelineItems.map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="group relative flex flex-col md:flex-row md:items-baseline justify-between py-10 gap-4 md:gap-12"
-                style={{
-                  borderTop: i === 0 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                }}
-              >
-                {/* 1px Accent Left Line on Hover */}
-                <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary scale-y-0 origin-top group-hover:scale-y-100 transition-transform duration-500 ease-out" />
-                
-                {/* Left Column: Date */}
-                <div className="md:w-1/4 shrink-0 px-4 md:px-6">
-                  <span className="font-mono text-xs text-white/40 tracking-widest">{item.period}</span>
-                </div>
-
-                {/* Right Column: Content */}
-                <div className="md:w-3/4 flex flex-col gap-3 px-4 md:px-0 pr-4 md:pr-8">
-                  <h4 className="font-display text-2xl md:text-3xl uppercase tracking-tight text-white group-hover:text-primary transition-colors duration-300">
-                    {item.role} <span className="text-white/20 px-2">|</span> <span className="text-white/60">{item.company}</span>
-                  </h4>
-                  <p className="text-white/50 text-sm md:text-base leading-relaxed font-body max-w-2xl">
-                    {item.desc}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* ── My Arsenal (Toolkit) ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-16"
-        >
-          <div className="flex items-center gap-4 mb-10">
-            <span className="font-mono text-[10px] text-white/25 uppercase tracking-[0.3em]">// Technical Arsenal</span>
-            <div className="h-px bg-white/10 flex-1" />
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {toolkitItems.map((tool, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-              >
-                <GlareCard
-                  gradient="linear-gradient(135deg, rgba(30,11,62,0.4) 0%, rgba(14,5,38,0.4) 100%)"
-                  accentColor="#a78bfa"
-                  className="h-full group"
-                >
-                  <div className="p-8 flex flex-col items-center justify-center text-center gap-4 min-h-[160px]">
-                    <tool.Icon size={28} className="text-primary group-hover:text-white transition-colors duration-300" strokeWidth={1} />
-                    <h5 className="font-display text-lg uppercase tracking-wider text-white">
-                      {tool.name}
-                    </h5>
-                    <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">
-                      {tool.category}
-                    </span>
-                  </div>
-                </GlareCard>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
         {/* ── Identity Reel ── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-6"
+          className="mb-16"
         >
           <div className="flex items-center gap-4 mb-6">
             <span className="font-mono text-[10px] text-white/25 uppercase tracking-[0.3em]">// Off The Clock</span>
@@ -526,6 +567,49 @@ export default function AboutSection() {
                 </GlareCard>
               </div>
             </div>
+          </div>
+        </motion.div>
+
+        {/* ── Technical Arsenal (bottom) — with colorful brand icons ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-6"
+        >
+          <div className="flex items-center gap-4 mb-10">
+            <span className="font-mono text-[10px] text-white/25 uppercase tracking-[0.3em]">// Technical Arsenal</span>
+            <div className="h-px bg-white/10 flex-1" />
+          </div>
+
+          <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-4">
+            {TOOLKIT_ITEMS.map((tool, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.85 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: i * 0.05 }}
+                className="group flex flex-col items-center gap-3 p-5 rounded-2xl cursor-default"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  transition: 'background 0.3s, border-color 0.3s, transform 0.3s',
+                }}
+                whileHover={{ scale: 1.08, y: -4 }}
+              >
+                <div 
+                  className="flex items-center justify-center"
+                  style={{ color: tool.color, filter: `drop-shadow(0 0 10px ${tool.color}77)` }}
+                >
+                  <tool.Icon size={36} />
+                </div>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-white/50 group-hover:text-white/80 transition-colors text-center leading-tight">
+                  {tool.name}
+                </span>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
 

@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { Mail, Linkedin, Github, MessageCircle, ArrowUpRight, Zap } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { Mail, Linkedin, Github, MessageCircle, ArrowUpRight, Zap, Check, Copy } from 'lucide-react';
 
 /* ─── Custom Icons ────────────────────────────────────────── */
 const WhatsappIcon = ({ size = 24, ...props }: any) => (
@@ -49,7 +49,9 @@ const socials = [
 function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: string | number }) {
   const [hovered, setHovered] = useState(false);
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLAnchorElement>(null);
+  const isEmail = s.label === 'Email';
 
   const handleMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
@@ -57,12 +59,22 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
     setMouse({ x: e.clientX - r.left, y: e.clientY - r.top });
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isEmail) return;
+    e.preventDefault();
+    navigator.clipboard.writeText('divyanshsaxena2903@gmail.com').then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
   return (
     <motion.a
       ref={ref}
-      href={s.href}
+      href={isEmail ? undefined : s.href}
       target={s.href.startsWith('http') ? '_blank' : undefined}
       rel="noopener noreferrer"
+      onClick={handleClick}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -111,35 +123,53 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
         style={{
           background: hovered ? `${s.accentColor}18` : 'rgba(255,255,255,0.04)',
           border: `1px solid ${hovered ? s.accentColor + '40' : 'rgba(255,255,255,0.08)'}`,
-          color: hovered ? s.accentColor : 'rgba(255,255,255,0.35)',
+          color: copied ? '#22c55e' : hovered ? s.accentColor : 'rgba(255,255,255,0.35)',
           boxShadow: hovered ? `0 0 16px ${s.accentColor}30` : 'none',
         }}
       >
-        <s.icon size={18} />
+        <AnimatePresence mode="wait">
+          {isEmail && copied ? (
+            <motion.span key="check" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }}>
+              <Check size={16} color="#22c55e" />
+            </motion.span>
+          ) : (
+            <motion.span key="icon" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }}>
+              <s.icon size={18} />
+            </motion.span>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Text */}
       <div className="relative z-10 flex-1 min-w-0">
         <p
           className="text-sm font-semibold leading-none mb-1 transition-colors duration-300"
-          style={{ color: hovered ? s.accentColor : 'rgba(255,255,255,0.85)' }}
+          style={{ color: (isEmail && copied) ? '#22c55e' : hovered ? s.accentColor : 'rgba(255,255,255,0.85)' }}
         >
-          {s.label}
+          {isEmail && copied ? 'Copied!' : s.label}
         </p>
         <p className="font-mono text-[11px] truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>
           {s.sub}
         </p>
       </div>
 
-      {/* Arrow */}
-      <ArrowUpRight
-        size={15}
-        className="relative z-10 flex-shrink-0 transition-all duration-300"
-        style={{
-          color: hovered ? s.accentColor : 'rgba(255,255,255,0.12)',
-          transform: hovered ? 'translate(2px,-2px)' : 'none',
-        }}
-      />
+      {/* Arrow / Copy icon */}
+      {isEmail ? (
+        <Copy
+          size={14}
+          className="relative z-10 flex-shrink-0 transition-all duration-300"
+          style={{ color: hovered ? s.accentColor : 'rgba(255,255,255,0.12)' }}
+        />
+      ) : (
+        <ArrowUpRight
+          size={15}
+          className="relative z-10 flex-shrink-0 transition-all duration-300"
+          style={{
+            color: hovered ? s.accentColor : 'rgba(255,255,255,0.12)',
+            transform: hovered ? 'translate(2px,-2px)' : 'none',
+          }}
+        />
+      )}
     </motion.a>
   );
 }
@@ -147,38 +177,109 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
 /* ─── Glow Input ─────────────────────────────────────────── */
 function GlowInput({
   id, label, type = 'text', placeholder, as = 'input', rows, options,
+  inputRef, selectRef, textareaRef,
 }: {
   id: string; label: string; type?: string; placeholder?: string;
   as?: 'input' | 'textarea' | 'select'; rows?: number;
   options?: { value: string; label: string }[];
+  inputRef?: React.RefObject<HTMLInputElement>;
+  selectRef?: React.RefObject<HTMLSelectElement>;
+  textareaRef?: React.RefObject<HTMLTextAreaElement>;
 }) {
   const [focused, setFocused] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (as !== 'select') return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+        setFocused(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [as]);
+
   const sharedClass = `w-full bg-[rgba(255,255,255,0.03)] rounded-xl px-4 py-3 text-white text-sm font-body placeholder-white/20 outline-none appearance-none transition-all duration-300 resize-none`;
   const sharedStyle: React.CSSProperties = {
-    border: `1px solid ${focused ? 'oklch(0.75 0.18 280 / 0.5)' : 'rgba(255,255,255,0.07)'}`,
-    boxShadow: focused ? '0 0 0 3px oklch(0.75 0.18 280 / 0.08), 0 0 20px oklch(0.75 0.18 280 / 0.1)' : 'none',
-    background: focused ? 'rgba(167,139,250,0.04)' : 'rgba(255,255,255,0.03)',
+    border: `1px solid ${focused || isOpen ? 'oklch(0.75 0.18 280 / 0.5)' : 'rgba(255,255,255,0.07)'}`,
+    boxShadow: focused || isOpen ? '0 0 0 3px oklch(0.75 0.18 280 / 0.08), 0 0 20px oklch(0.75 0.18 280 / 0.1)' : 'none',
+    background: focused || isOpen ? 'rgba(167,139,250,0.04)' : 'rgba(255,255,255,0.03)',
   };
 
   return (
-    <div className="space-y-2">
+    <div className={`space-y-2 ${as === 'select' ? 'relative' : ''}`} ref={containerRef}>
       <label htmlFor={id} className="block text-[11px] font-mono uppercase tracking-[0.2em] text-white/35">
         {label}
       </label>
       {as === 'textarea' ? (
-        <textarea id={id} rows={rows || 4} placeholder={placeholder} className={`${sharedClass} leading-relaxed`}
+        <textarea ref={textareaRef} id={id} rows={rows || 4} placeholder={placeholder} className={`${sharedClass} leading-relaxed`}
           style={sharedStyle} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} />
       ) : as === 'select' ? (
-        <select id={id} className={`${sharedClass} cursor-pointer`}
-          style={{ ...sharedStyle, color: 'rgba(255,255,255,0.7)' }}
-          onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}>
-          <option value="" style={{ background: '#080808' }}>Select…</option>
-          {options?.map((o) => (
-            <option key={o.value} value={o.value} style={{ background: '#080808' }}>{o.label}</option>
-          ))}
-        </select>
+        <>
+          {/* Hidden select to preserve form refs & native behaviour */}
+          <select ref={selectRef} id={id} value={selectedValue} onChange={(e) => setSelectedValue(e.target.value)} className="hidden">
+            <option value="">Select…</option>
+            {options?.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+
+          {/* Custom Select Trigger */}
+          <div
+            onClick={() => { setIsOpen(!isOpen); setFocused(!isOpen); }}
+            className={`${sharedClass} cursor-pointer flex items-center justify-between select-none`}
+            style={{ ...sharedStyle, color: selectedValue ? 'white' : 'rgba(255,255,255,0.3)' }}
+          >
+            <span>{selectedValue ? options?.find(o => o.value === selectedValue)?.label : 'Select…'}</span>
+            <motion.svg animate={{ rotate: isOpen ? 180 : 0 }} className="w-3 h-3 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </motion.svg>
+          </div>
+
+          {/* Custom Select Dropdown Options */}
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-full left-0 right-0 mt-2 z-50 rounded-xl overflow-hidden backdrop-blur-xl"
+                style={{
+                  background: 'rgba(10, 5, 20, 0.95)',
+                  border: '1px solid rgba(167,139,250,0.2)',
+                  boxShadow: '0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(167,139,250,0.1)',
+                }}
+              >
+                <div className="max-h-60 overflow-y-auto py-1">
+                  <div
+                    onClick={() => { setSelectedValue(''); setIsOpen(false); setFocused(false); }}
+                    className="px-4 py-3 text-sm text-white/40 hover:bg-white/5 hover:text-white cursor-pointer transition-colors"
+                  >
+                    Select…
+                  </div>
+                  {options?.map((o) => (
+                    <div
+                      key={o.value}
+                      onClick={() => { setSelectedValue(o.value); setIsOpen(false); setFocused(false); }}
+                      className={`px-4 py-3 text-sm cursor-pointer transition-colors ${
+                        selectedValue === o.value
+                          ? 'bg-primary/20 text-primary'
+                          : 'text-white/80 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      {o.label}
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
       ) : (
-        <input id={id} type={type} placeholder={placeholder} className={sharedClass}
+        <input ref={inputRef} id={id} type={type} placeholder={placeholder} className={sharedClass}
           style={sharedStyle} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} />
       )}
     </div>
@@ -191,10 +292,69 @@ export default function Contact() {
   const headerInView = useInView(sectionRef, { once: true, margin: '-80px' });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [showOptional, setShowOptional] = useState(false);
 
-  const handleSend = () => {
+  // Refs to read form values
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const socialRef = useRef<HTMLInputElement>(null);
+  const budgetRef = useRef<HTMLSelectElement>(null);
+  const typeRef = useRef<HTMLSelectElement>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleSend = async () => {
+    const name    = nameRef.current?.value    || '';
+    const email   = emailRef.current?.value   || '';
+    const phone   = phoneRef.current?.value   || '';
+    const social  = socialRef.current?.value  || '';
+    const budget  = budgetRef.current?.value  || '';
+    const type    = typeRef.current?.value    || '';
+    const message = messageRef.current?.value || '';
+
+    if (!name || !email || !message) {
+      alert('Please fill out all required fields.');
+      return;
+    }
+
     setSending(true);
-    setTimeout(() => { setSending(false); setSent(true); }, 1800);
+
+    try {
+      const response = await fetch('https://formspree.io/f/mvzdoewb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          social,
+          budget,
+          projectType: type,
+          message
+        })
+      });
+
+      if (response.ok) {
+        setSent(true);
+        // Clear form
+        if (nameRef.current) nameRef.current.value = '';
+        if (emailRef.current) emailRef.current.value = '';
+        if (phoneRef.current) phoneRef.current.value = '';
+        if (socialRef.current) socialRef.current.value = '';
+        if (messageRef.current) messageRef.current.value = '';
+        setShowOptional(false);
+        setTimeout(() => setSent(false), 5000);
+      } else {
+        throw new Error('Failed to send message');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong. Please try again or email me directly.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -294,24 +454,73 @@ export default function Contact() {
 
             <form className="space-y-6 relative z-10" onSubmit={(e) => e.preventDefault()}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <GlowInput id="name" label="Full Name" placeholder="Divyansh Saxena" />
-                <GlowInput id="email" type="email" label="Email Address" placeholder="you@example.com" />
+                <GlowInput id="name" label="Full Name" placeholder="Divyansh Saxena" inputRef={nameRef} />
+                <GlowInput id="email" type="email" label="Email Address" placeholder="you@example.com" inputRef={emailRef} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <GlowInput id="budget" label="Budget Range" as="select" options={[
-                  { value: '<1k', label: '< $1,000' },
+                <GlowInput id="budget" label="Budget Range" as="select" selectRef={budgetRef} options={[
+                  { value: '0-100', label: '$0 – $100' },
+                  { value: '100-1k', label: '$100 – $1,000' },
                   { value: '1k-5k', label: '$1,000 – $5,000' },
                   { value: '5k-10k', label: '$5,000 – $10,000' },
                   { value: '10k+', label: '$10,000+' },
                 ]} />
-                <GlowInput id="type" label="Project Type" as="select" options={[
+                <GlowInput id="type" label="Project Type" as="select" selectRef={typeRef} options={[
                   { value: 'web', label: 'Web Development' },
                   { value: 'video', label: 'Video Editing' },
                   { value: 'motion', label: 'Motion Graphics' },
                   { value: 'design', label: 'UI / UX Design' },
                 ]} />
               </div>
-              <GlowInput id="message" label="Message" as="textarea" rows={5} placeholder="Tell me what you're building…" />
+
+              <div className="flex items-center py-1">
+                <label htmlFor="showOptional" className="flex items-center gap-3 cursor-pointer group">
+                  <div
+                    className="relative flex items-center justify-center w-5 h-5 rounded transition-all duration-300"
+                    style={{
+                      background: showOptional ? '#a78bfa' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${showOptional ? '#a78bfa' : 'rgba(255,255,255,0.1)'}`,
+                      boxShadow: showOptional ? '0 0 12px rgba(167,139,250,0.4)' : 'none',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      id="showOptional"
+                      checked={showOptional}
+                      onChange={(e) => setShowOptional(e.target.checked)}
+                      className="sr-only"
+                    />
+                    <Check
+                      size={14}
+                      strokeWidth={4}
+                      className={`transition-all duration-300 ${showOptional ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
+                      style={{ color: '#1a0845' }}
+                    />
+                  </div>
+                  <span className="text-[11px] font-mono text-white/40 group-hover:text-white/70 transition-colors uppercase tracking-widest select-none">
+                    More Details
+                  </span>
+                </label>
+              </div>
+
+              <AnimatePresence>
+                {showOptional && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pb-2">
+                      <GlowInput id="phone" label="Phone / WhatsApp" placeholder="e.g. +91 00000 00000" type="tel" inputRef={phoneRef} />
+                      <GlowInput id="social" label="Social Media" placeholder="e.g. instagram.com/yourname" inputRef={socialRef} />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <GlowInput id="message" label="Message" as="textarea" rows={5} placeholder="Tell me what you're building…" textareaRef={messageRef} />
 
               <motion.button
                 type="button"

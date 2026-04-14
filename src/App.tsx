@@ -18,8 +18,8 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Story from './components/Story';
 import Showcase from './components/Showcase';
-import Testimonials from './components/Testimonials';
 import GradualBlur from './components/GradualBlur';
+import CaseStudyDetail from './components/CaseStudyDetail';
 
 import LaserFlow from './components/canvas/LaserFlow';
 
@@ -35,7 +35,6 @@ const Home: React.FC = () => {
       <Hero />
       <Story />
       <Showcase />
-      <Testimonials />
       <Contact />
     </motion.main>
   );
@@ -95,28 +94,7 @@ const Work: React.FC = () => {
   );
 }
 
-const CaseStudy: React.FC<{ id: string }> = ({ id }) => {
-  // Placeholder for Case Study page
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
-      className="min-h-screen pt-32 px-6 max-w-7xl mx-auto"
-    >
-      <h1 className="text-5xl md:text-7xl font-display uppercase tracking-tight mb-8">
-        {id.toUpperCase()} CASE STUDY
-      </h1>
-      <p className="text-text-secondary text-xl">
-        This is a placeholder for the {id} case study page.
-      </p>
-      <a href="/" className="inline-block mt-8 px-6 py-3 bg-primary text-white font-bold rounded-full">
-        Back to Home
-      </a>
-    </motion.div>
-  );
-}
+
 
 function AppContent() {
   const location = useLocation();
@@ -160,7 +138,7 @@ function AppContent() {
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/work" element={<Work />} />
-                <Route path="/work/:id" element={<CaseStudy id={location.pathname.split('/').pop() || ''} />} />
+                <Route path="/work/:id" element={<CaseStudyDetail />} />
               </Routes>
             </motion.div>
           </AnimatePresence>

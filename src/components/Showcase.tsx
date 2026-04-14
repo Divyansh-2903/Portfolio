@@ -1,136 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { ArrowUpRight, Play, Code2, Film, Layers } from 'lucide-react';
+import { client } from '../lib/sanity';
 
-/* ─── Types ─────────────────────────────────────────── */
-export type Category = 'fullstack' | 'video';
-
-export interface Project {
-  id: string;
-  title: string;
-  subtitle: string;
-  desc: string;
-  category: Category;
-  tech: string[];
-  accentColor: string;
-  gradient: string;
-  year: string;
-  role: string;
-  metrics?: { label: string; value: string }[];
-  featured?: boolean;
-}
-
-/* ─── Project Data ───────────────────────────────────── */
-export const projects: Project[] = [
-  /* ── Fullstack ── */
-  {
-    id: 'onecliphub',
-    category: 'fullstack',
-    title: 'OneClipHub',
-    subtitle: 'SaaS Platform',
-    desc: 'An all-in-one content command centre for video creators — manage, edit, publish, and monetise from a single dashboard.',
-    tech: ['Next.js 14', 'Supabase', 'Stripe', 'Tailwind', 'tRPC'],
-    accentColor: '#a78bfa',
-    gradient: 'linear-gradient(135deg, #1a0533 0%, #0d0122 40%, #1d0845 100%)',
-    year: '2024',
-    role: 'Fullstack Engineer',
-    metrics: [{ label: 'Active Users', value: '2.4k' }, { label: 'MRR', value: '$14k' }],
-    featured: true,
-  },
-  {
-    id: 'grindxgrowth',
-    category: 'fullstack',
-    title: 'GrindXGrowth',
-    subtitle: 'Marketing Dashboard',
-    desc: 'A high-performance analytics dashboard for a digital-marketing agency tracking 30+ client campaigns in real time.',
-    tech: ['React', 'Framer Motion', 'GSAP', 'Recharts'],
-    accentColor: '#818cf8',
-    gradient: 'linear-gradient(135deg, #0f1744 0%, #080d2b 60%, #0c1a3f 100%)',
-    year: '2024',
-    role: 'Frontend Lead',
-    metrics: [{ label: 'Load Time', value: '0.8s' }, { label: 'Clients', value: '30+' }],
-  },
-  {
-    id: 'onclip-ext',
-    category: 'fullstack',
-    title: 'OnClip Extension',
-    subtitle: 'Browser Extension',
-    desc: 'A productivity-boosting Chrome extension for video editors — clip timestamps, annotate timelines, export to DaVinci.',
-    tech: ['TypeScript', 'Chrome API', 'React', 'Zustand'],
-    accentColor: '#c084fc',
-    gradient: 'linear-gradient(135deg, #1e0533 0%, #100224 60%, #1a0540 100%)',
-    year: '2023',
-    role: 'Solo Developer',
-    metrics: [{ label: 'Downloads', value: '800+' }, { label: 'Rating', value: '4.9★' }],
-  },
-  {
-    id: 'launchpad',
-    category: 'fullstack',
-    title: 'LaunchPad',
-    subtitle: 'Startup OS',
-    desc: 'A project-management and investor-relations platform built specifically for early-stage startups.',
-    tech: ['Next.js', 'PostgreSQL', 'Prisma', 'Resend'],
-    accentColor: '#e879f9',
-    gradient: 'linear-gradient(135deg, #1a0b3c 0%, #0e0621 60%, #180b3a 100%)',
-    year: '2024',
-    role: 'Lead Engineer',
-    metrics: [{ label: 'Teams', value: '50+' }, { label: 'Raised', value: '$1.2M' }],
-  },
-  /* ── Video Editing ── */
-  {
-    id: 'brand-reel',
-    category: 'video',
-    title: 'Brand Reel — Helix',
-    subtitle: 'Commercial Production',
-    desc: 'A 90-second brand identity reel for Helix, a fintech startup — combining kinetic typography with motion data viz.',
-    tech: ['After Effects', 'Premiere Pro', 'Cinema 4D', 'DaVinci Resolve'],
-    accentColor: '#f472b6',
-    gradient: 'linear-gradient(135deg, #1a0520 0%, #0d0114 60%, #1c0628 100%)',
-    year: '2024',
-    role: 'Motion Director',
-    metrics: [{ label: 'Views', value: '1.2M' }, { label: 'CTR', value: '+340%' }],
-    featured: true,
-  },
-  {
-    id: 'documentary-cut',
-    category: 'video',
-    title: 'Founders: Untold',
-    subtitle: 'Documentary Series',
-    desc: 'A 4-part documentary series following bootstrapped startup founders — edited from 200+ hours of raw footage.',
-    tech: ['Premiere Pro', 'DaVinci Resolve', 'Adobe Audition', 'Lumetri'],
-    accentColor: '#fb923c',
-    gradient: 'linear-gradient(135deg, #1a1005 0%, #0d0a01 60%, #1c1408 100%)',
-    year: '2023',
-    role: 'Lead Editor',
-    metrics: [{ label: 'Episodes', value: '4' }, { label: 'Watch Time', value: '18 min avg' }],
-  },
-  {
-    id: 'social-motion',
-    category: 'video',
-    title: 'Social Motion Pack',
-    subtitle: 'Content Package',
-    desc: 'A 60-asset motion graphics package for a fitness brand — reels, stories, and ads that tripled their engagement.',
-    tech: ['After Effects', 'Illustrator', 'Lottie', 'CapCut'],
-    accentColor: '#34d399',
-    gradient: 'linear-gradient(135deg, #021a0e 0%, #010d07 60%, #031a10 100%)',
-    year: '2024',
-    role: 'Motion Designer',
-    metrics: [{ label: 'Assets', value: '60+' }, { label: 'Engagement', value: '+220%' }],
-  },
-  {
-    id: 'product-launch',
-    category: 'video',
-    title: 'Product Launch — Aura',
-    subtitle: 'Launch Campaign',
-    desc: 'Full launch video suite for a wellness-tech product — hero video, 6 ads, 12 social cuts — all from a single shoot.',
-    tech: ['Premiere Pro', 'After Effects', 'DaVinci', 'Midjourney'],
-    accentColor: '#60a5fa',
-    gradient: 'linear-gradient(135deg, #020f1a 0%, #010810 60%, #020d18 100%)',
-    year: '2024',
-    role: 'Creative Director',
-    metrics: [{ label: 'Ad ROAS', value: '6.2×' }, { label: 'Revenue', value: '$420k' }],
-  },
-];
+import { Category, Project, projects } from '../data/projects';
 
 /* ─── Category Icon ──────────────────────────────────── */
 const CategoryIcon = ({ cat }: { cat: Category }) =>
@@ -454,11 +327,30 @@ const tabs: { key: Category; label: string; icon: React.ReactNode }[] = [
 /* ─── Export ─────────────────────────────────────────── */
 export default function Showcase({ hideHeader = false }: { hideHeader?: boolean }) {
   const [active, setActive] = useState<Category>('fullstack');
+  const [displayProjects, setDisplayProjects] = useState<Project[]>(projects);
   const headerRef = useRef<HTMLDivElement>(null);
   const headerInView = useInView(headerRef, { once: true, margin: '-80px' });
 
-  const featured = projects.find((p) => p.category === active && p.featured);
-  const rest = projects.filter((p) => p.category === active && !p.featured);
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const data = await client.fetch(`*[_type == "project"] | order(_createdAt desc) {
+          _id, 
+          "id": id.current, 
+          title, subtitle, desc, category, tech, accentColor, gradient, year, role, metrics, featured
+        }`);
+        if (data && data.length > 0) {
+          setDisplayProjects(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch projects from Sanity:", err);
+      }
+    }
+    fetchProjects();
+  }, []);
+
+  const featured = displayProjects.find((p) => p.category === active && p.featured);
+  const rest = displayProjects.filter((p) => p.category === active && !p.featured);
 
   useEffect(() => {
     setActive('fullstack');

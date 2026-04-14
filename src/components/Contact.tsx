@@ -320,7 +320,8 @@ export default function Contact() {
     setSending(true);
 
     try {
-      const response = await fetch('https://formspree.io/f/mvzdoewb', {
+      const formspreeId = import.meta.env.VITE_FORMSPREE_ID || 'mvzdoewb';
+      const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

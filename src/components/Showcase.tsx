@@ -6,21 +6,23 @@ import { client } from '../lib/sanity';
 import { Category, Project, projects } from '../data/projects';
 
 /* ─── Category Icon ──────────────────────────────────── */
-const CategoryIcon = ({ cat }: { cat: Category }) =>
-  cat === 'fullstack' ? <Code2 size={14} /> : <Film size={14} />;
+const CategoryIcon = React.memo(({ cat }: { cat: Category }) =>
+  cat === 'fullstack' ? <Code2 size={14} /> : <Film size={14} />);
+CategoryIcon.displayName = 'CategoryIcon';
 
 /* ─── Metric Chip ────────────────────────────────────── */
-const MetricChip = ({ label, value, color }: { label: string; value: string; color: string; key?: React.Key }) => (
+const MetricChip = React.memo(({ label, value, color }: { label: string; value: string; color: string; key?: React.Key }) => (
   <span
     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono"
     style={{ background: `${color}18`, color, border: `1px solid ${color}30` }}
   >
     {value} <span className="opacity-60">{label}</span>
   </span>
-);
+));
+MetricChip.displayName = 'MetricChip';
 
 /* ─── Project Card ───────────────────────────────────── */
-const ProjectCard = ({ project, index }: { project: Project; index: number; key?: React.Key }) => {
+const ProjectCard = React.memo(({ project, index }: { project: Project; index: number; key?: React.Key }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const inView = useInView(cardRef, { once: true, margin: '-80px' });
   const [hovered, setHovered] = useState(false);
@@ -160,10 +162,11 @@ const ProjectCard = ({ project, index }: { project: Project; index: number; key?
       </div>
     </motion.div>
   );
-};
+});
+ProjectCard.displayName = 'ProjectCard';
 
 /* ─── Featured Card ──────────────────────────────────── */
-const FeaturedCard = ({ project }: { project: Project }) => {
+const FeaturedCard = React.memo(({ project }: { project: Project }) => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
   const [hovered, setHovered] = useState(false);
@@ -316,7 +319,8 @@ const FeaturedCard = ({ project }: { project: Project }) => {
       </div>
     </motion.div>
   );
-};
+});
+FeaturedCard.displayName = 'FeaturedCard';
 
 /* ─── Tab Pill ───────────────────────────────────────── */
 const tabs: { key: Category; label: string; icon: React.ReactNode }[] = [

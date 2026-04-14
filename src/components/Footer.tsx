@@ -12,7 +12,7 @@ const WhatsappIcon = ({ size = 24, ...props }: any) => (
 );
 
 /* ─── Social Icon ───────────────────────────────────────── */
-function SocialIcon({
+const SocialIcon = React.memo(function SocialIcon({
   href, icon: Icon, label, color,
 }: { href: string; icon: React.FC<{ size?: number }>; label: string; color: string }) {
   const [hovered, setHovered] = useState(false);
@@ -33,10 +33,11 @@ function SocialIcon({
       <Icon size={15} />
     </motion.a>
   );
-}
+});
+SocialIcon.displayName = 'SocialIcon';
 
 /* ─── Footer ─────────────────────────────────────────────── */
-export default function Footer() {
+const Footer = React.memo(function Footer() {
   const year = new Date().getFullYear();
 
   return (
@@ -170,4 +171,7 @@ export default function Footer() {
         style={{ background: 'linear-gradient(90deg, transparent, oklch(0.75 0.18 280 / 0.25), transparent)' }} />
     </footer>
   );
-}
+});
+Footer.displayName = 'Footer';
+
+export default Footer;

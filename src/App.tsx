@@ -3,25 +3,29 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type {} from 'framer-motion'; // keep tree-shaking clean
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
-// Components
-import LoadingScreen from './components/LoadingScreen';
-import GlobalElements from './components/GlobalElements';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import AboutSection from './components/AboutSection';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
-import Story from './components/Story';
-import Showcase from './components/Showcase';
-import GradualBlur from './components/GradualBlur';
-import CaseStudyDetail from './components/CaseStudyDetail';
+// Utility for suspense fallbacks
+const LoadingFallback = () => null;
 
-import LaserFlow from './components/canvas/LaserFlow';
+// Lazy Load Components
+const LoadingScreen = lazy(() => import('./components/LoadingScreen'));
+const GlobalElements = lazy(() => import('./components/GlobalElements'));
+const Navbar = lazy(() => import('./components/Navbar'));
+const Hero = lazy(() => import('./components/Hero'));
+const AboutSection = lazy(() => import('./components/AboutSection'));
+const Contact = lazy(() => import('./components/Contact'));
+const Footer = lazy(() => import('./components/Footer'));
+const Story = lazy(() => import('./components/Story'));
+const Showcase = lazy(() => import('./components/Showcase'));
+const GradualBlur = lazy(() => import('./components/GradualBlur'));
+const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
+
+// Heavy Canvas components
+const LaserFlow = lazy(() => import('./components/canvas/LaserFlow'));
 
 const Home: React.FC = () => {
   return (
@@ -101,7 +105,7 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
 
   return (
-    <>
+    <Suspense fallback={<LoadingFallback />}>
       <div className="fixed inset-0 z-0 w-full h-full pointer-events-none">
         <LaserFlow
           horizontalSizing={2.5}
@@ -127,7 +131,7 @@ function AppContent() {
       </AnimatePresence>
 
       {!loading && (
-        <>
+        <Suspense fallback={<LoadingFallback />}>
           <GlobalElements />
 
           <Navbar />
@@ -149,9 +153,9 @@ function AppContent() {
           <StickyCTA />
 
           <GlobalVignette />
-        </>
+        </Suspense>
       )}
-    </>
+    </Suspense>
   );
 }
 

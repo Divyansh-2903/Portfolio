@@ -5,7 +5,7 @@ import { Menu, X } from 'lucide-react';
 import { useLenis } from 'lenis/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-export default function Navbar() {
+const Navbar = React.memo(function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const lenis = useLenis();
@@ -153,4 +153,7 @@ export default function Navbar() {
       </AnimatePresence>
     </>
   );
-}
+});
+
+Navbar.displayName = 'Navbar';
+export default Navbar;

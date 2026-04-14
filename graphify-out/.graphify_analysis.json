@@ -1,0 +1,232 @@
+{
+  "communities": {
+    "0": [
+      "app_handleclick",
+      "app_handlescroll",
+      "app_home",
+      "app_update",
+      "app_work",
+      "main_update",
+      "src_app_tsx",
+      "src_main_tsx"
+    ],
+    "1": [
+      "magicbento_calculatespotlightvalues",
+      "magicbento_createparticleelement",
+      "magicbento_globalspotlight",
+      "magicbento_particlecard",
+      "magicbento_updatecardglowproperties",
+      "magicbento_usemobiledetection",
+      "src_components_magicbento_tsx"
+    ],
+    "2": [
+      "branding_color_system",
+      "identity_logo",
+      "identity_portrait",
+      "portfolio_root",
+      "prd_blueprint"
+    ],
+    "3": [
+      "contact_handlemove",
+      "contact_handlesend",
+      "contact_whatsappicon",
+      "src_components_contact_tsx"
+    ],
+    "4": [
+      "showcase_categoryicon",
+      "showcase_handlemousemove",
+      "showcase_metricchip",
+      "src_components_showcase_tsx"
+    ],
+    "5": [
+      "footer_socialicon",
+      "footer_whatsappicon",
+      "src_components_footer_tsx"
+    ],
+    "6": [
+      "globalelements_handlemouseover",
+      "globalelements_updatemouseposition",
+      "src_components_globalelements_tsx"
+    ],
+    "7": [
+      "navbar_handlenavclick",
+      "navbar_handlescroll",
+      "src_components_navbar_tsx"
+    ],
+    "8": [
+      "rotatingtext_cn",
+      "rotatingtext_splitintocharacters",
+      "src_components_rotatingtext_tsx"
+    ],
+    "9": [
+      "selectedworks_techtag",
+      "selectedworks_tiltcard",
+      "src_components_selectedworks_tsx"
+    ],
+    "10": [
+      "src_components_story_tsx",
+      "story_buildwords",
+      "story_scrollword"
+    ],
+    "11": [
+      "aboutsection_old_animatedcounter",
+      "aboutsection_old_glarecard",
+      "src_components_about_aboutsection_old_tsx"
+    ],
+    "12": [
+      "laserflow_hextorgb",
+      "laserflow_laserflow",
+      "src_components_canvas_laserflow_tsx"
+    ],
+    "13": [
+      "aboutsection_glarecard",
+      "src_components_aboutsection_tsx"
+    ],
+    "14": [
+      "flowingmenu_handlemousemove",
+      "src_components_flowingmenu_tsx"
+    ],
+    "15": [
+      "gradualblur_pct",
+      "src_components_gradualblur_tsx"
+    ],
+    "16": [
+      "loadingscreen_loadingscreen",
+      "src_components_loadingscreen_tsx"
+    ],
+    "17": [
+      "src_components_testimonials_tsx",
+      "testimonials_animatedcounter"
+    ],
+    "18": [
+      "globeviz_tick",
+      "src_components_canvas_globeviz_tsx"
+    ],
+    "19": [
+      "vite_config_ts"
+    ],
+    "20": [
+      "src_components_bentogrid_tsx"
+    ],
+    "21": [
+      "src_components_faq_tsx"
+    ],
+    "22": [
+      "src_components_hero_tsx"
+    ],
+    "23": [
+      "src_components_services_tsx"
+    ]
+  },
+  "cohesion": {
+    "0": 0.25,
+    "1": 0.29,
+    "2": 0.4,
+    "3": 0.5,
+    "4": 0.5,
+    "5": 0.67,
+    "6": 0.67,
+    "7": 0.67,
+    "8": 0.67,
+    "9": 0.67,
+    "10": 0.67,
+    "11": 0.67,
+    "12": 0.67,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0
+  },
+  "gods": [
+    {
+      "id": "portfolio_root",
+      "label": "Portfolio Website",
+      "edges": 4
+    },
+    {
+      "id": "prd_blueprint",
+      "label": "Master Portfolio Blueprint",
+      "edges": 1
+    },
+    {
+      "id": "identity_logo",
+      "label": "DS Monogram Logo",
+      "edges": 1
+    },
+    {
+      "id": "identity_portrait",
+      "label": "Professional Portrait (Divyansh)",
+      "edges": 1
+    },
+    {
+      "id": "branding_color_system",
+      "label": "Black & Orange Visual Identity",
+      "edges": 1
+    }
+  ],
+  "surprises": [
+    {
+      "source": "DS Monogram Logo",
+      "target": "Portfolio Website",
+      "source_files": [
+        "public/favicon.png",
+        "README.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "references",
+      "why": "inferred connection - not explicitly stated in source; crosses file types (doc \u2194 image); connects across different repos/directories"
+    },
+    {
+      "source": "Professional Portrait (Divyansh)",
+      "target": "Portfolio Website",
+      "source_files": [
+        "public/assets/divyansh.jpg",
+        "README.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "references",
+      "why": "inferred connection - not explicitly stated in source; crosses file types (doc \u2194 image); connects across different repos/directories"
+    },
+    {
+      "source": "Master Portfolio Blueprint",
+      "target": "Portfolio Website",
+      "source_files": [
+        "prd.md",
+        "README.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "rationale_for",
+      "why": "connects across different repos/directories"
+    },
+    {
+      "source": "Black & Orange Visual Identity",
+      "target": "Portfolio Website",
+      "source_files": [
+        "prd.md",
+        "README.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "conceptually_related_to",
+      "why": "connects across different repos/directories"
+    }
+  ],
+  "questions": [
+    {
+      "type": "verify_inferred",
+      "question": "Are the 2 inferred relationships involving `Portfolio Website` (e.g. with `DS Monogram Logo` and `Professional Portrait (Divyansh)`) actually correct?",
+      "why": "`Portfolio Website` has 2 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `Master Portfolio Blueprint`, `DS Monogram Logo`, `Professional Portrait (Divyansh)` to the rest of the system?",
+      "why": "4 weakly-connected nodes found - possible documentation gaps or missing edges."
+    }
+  ]
+}

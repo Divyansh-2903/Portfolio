@@ -1,67 +1,63 @@
 import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { Palette, Cpu, ExternalLink } from 'lucide-react';
-import FlowingMenu from './FlowingMenu';
+import { Palette, Cpu, ExternalLink, Code2, Database, Layers, Terminal, PenTool, LayoutTemplate, Sparkles, Server } from 'lucide-react';
+import { projects } from './Showcase';
 
-/* ─── Work Timeline Data ────────────────────────────────────── */
+
 const timelineItems = [
   {
-    link: '#',
-    text: 'Freelance — Web Developer',
-    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop',
-    period: '2024 — Present',
-    role: 'Fullstack Developer',
-    desc: 'Building custom web apps, portfolios, and SaaS products for international clients. React, Next.js, Node.js, Supabase.',
+    period: '2025 — Present',
+    role: 'Lead Fullstack Engineer',
+    company: 'Digital Agency',
+    desc: 'Led a team of developers to build scalable SaaS platforms and complex data ecosystems. Delivered end-to-end cinematic web experiences for enterprise clients using Next.js and Supabase.',
   },
   {
-    link: '#',
-    text: 'Motion Architect — Video Editor',
-    image: 'https://images.unsplash.com/photo-1536240478700-b869ad10da2a?q=80&w=800&auto=format&fit=crop',
-    period: '2024 — Present',
-    role: 'Motion Designer',
-    desc: 'Crafting high-impact reels, YouTube content, and brand films. After Effects, Premiere Pro, DaVinci Resolve.',
+    period: '2024 — 2025',
+    role: 'Freelance Architect',
+    company: 'Independent',
+    desc: 'Built 20+ custom applications ranging from cinematic portfolios to robust e-commerce solutions. Focused on bridging the gap between high-fidelity design and rigorous technical execution.',
   },
   {
-    link: '#',
-    text: 'UI/UX Designer',
-    image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?q=80&w=800&auto=format&fit=crop',
-    period: '2024 — Present',
-    role: 'Product Designer',
-    desc: 'Designing cinematic, conversion-focused interfaces. Figma, high-fidelity prototypes, design systems.',
-  },
-  {
-    link: '#',
-    text: 'Learning Phase — CS Student',
-    image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=800&auto=format&fit=crop',
     period: '2023 — 2024',
-    role: 'CS Undergraduate',
-    desc: 'Laying the technical foundation. Data structures, algorithms, system design, and first real-world projects.',
+    role: 'Frontend Developer',
+    company: 'Tech Startup',
+    desc: 'Engineered high-performance dashboards and interactive UI components. Pioneered frontend optimization strategies that boosted overall platform loading speed by 40%.',
   },
+  {
+    period: '2022 — 2023',
+    role: 'Creative Designer',
+    company: 'Studio',
+    desc: 'Established foundational brand identities and motion graphics reels. Developed comprehensive UI/UX design systems before fully transitioning into software engineering.',
+  },
+];
+
+const toolkitItems = [
+  { name: 'Next.js & React', category: 'Engineering', Icon: Code2 },
+  { name: 'TypeScript',      category: 'Language',    Icon: Terminal },
+  { name: 'Supabase',        category: 'Backend',     Icon: Database },
+  { name: 'Tailwind CSS',    category: 'Styling',     Icon: LayoutTemplate },
+  { name: 'Cursor & AI',     category: 'Workflow',    Icon: Sparkles },
+  { name: 'Framer Motion',   category: 'Animation',   Icon: Layers },
+  { name: 'Figma',           category: 'Design',      Icon: PenTool },
+  { name: 'Node.js',         category: 'Server',      Icon: Server },
 ];
 
 /* ─── Design DNA Cards ──────────────────────────────────────── */
 const designCards = [
   {
-    num: '01', tag: 'Design DNA', accent: '#a78bfa',
+    num: 'G1', tag: 'THE INSTINCT', accent: '#a78bfa',
     gradient: 'linear-gradient(135deg, #1a0533 0%, #0d0122 40%, #1d0845 100%)',
     Icon: Palette,
-    title: 'Atmospheric Aesthetics',
-    body: 'Rejecting the blocky internet for a high-end cinematic feel. Intentional asymmetry, massive negative space, and dynamic glows create depth without heavy shadows.',
+    title: 'ATMOSPHERIC AESTHETICS',
+    body: 'Cinematic over corporate. I design for the pause — that split second where someone stops scrolling because something felt different. That reaction is the whole point.',
   },
   {
-    num: '02', tag: 'The Craft', accent: '#818cf8',
+    num: 'G2', tag: 'THE SPINE', accent: '#818cf8',
     gradient: 'linear-gradient(135deg, #0f1744 0%, #080d2b 60%, #0c1a3f 100%)',
     Icon: Cpu,
-    title: 'Precision Engineering',
-    body: 'Beyond the visuals lies a rigid technical foundation. React, TypeScript, performant animations, scalable state management, and type-safe architectures.',
+    title: 'PRECISION ENGINEERING',
+    body: "Clean architecture isn't invisible — it's what makes everything else possible. From backend logic to frame-perfect motion, I build the parts people never see so the parts they do feel effortless.",
   },
-];
-
-const stats = [
-  { tag: '01 // Time',   val: '2024', label: 'Year Started'   },
-  { tag: '02 // Output', val: '21+',  label: 'Projects Built' },
-  { tag: '03 // Reach',  val: '12+',  label: 'Happy Clients'  },
-  { tag: '04 // Scope',  val: '5+',   label: 'Countries'      },
 ];
 
 /* ─── Reusable Glare Card ────────────────────────────────────── */
@@ -147,6 +143,19 @@ export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerInView = useInView(sectionRef, { once: true, margin: '-80px' });
 
+  const dynamicStats = React.useMemo(() => {
+    const uniqueCategories = new Set(projects.map(p => p.category)).size;
+    const allTech = projects.flatMap(p => p.tech);
+    const uniqueTechCount = new Set(allTech).size;
+    
+    return [
+      { tag: '01 // Time',   val: new Date().getFullYear().toString(), label: 'Current Year'   },
+      { tag: '02 // Output', val: `${projects.length}+`,  label: 'Projects Built' },
+      { tag: '03 // Scope',  val: `${uniqueCategories}`,   label: 'Core Disciplines'      },
+      { tag: '04 // Stack',  val: `${uniqueTechCount}+`,  label: 'Tech Mastered'  },
+    ];
+  }, []);
+
   return (
     <section id="about" ref={sectionRef} className="relative py-32 bg-bg overflow-hidden">
 
@@ -223,14 +232,13 @@ export default function AboutSection() {
                 </span>
                 <div>
                   <p className="font-display text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight text-white leading-[1.05] mb-8">
-                    I design at the intersection of{' '}
+                    I DON'T MAKE THINGS LOOK GOOD.{' '}
                     <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-300 to-indigo-300">
-                      logic & emotion.
+                      I MAKE THEM FEEL INEVITABLE.
                     </span>
                   </p>
                   <p className="text-white/40 font-body text-base leading-relaxed max-w-lg">
-                    Every line of code is a brushstroke. Every layout, a narrative. I build for users who
-                    feel the difference between mediocre and exceptional — even when they can't name it.
+                    Every project I touch is a decision about what the internet should feel like. Deliberate, precise, and impossible to ignore.
                   </p>
                 </div>
                 <div className="flex items-center gap-3 mt-10 pt-8"
@@ -282,6 +290,43 @@ export default function AboutSection() {
           </motion.div>
         </div>
 
+        {/* ── The Pulse (Metrics) ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-6"
+        >
+          <GlareCard
+            gradient="linear-gradient(135deg, #1e0b3e 0%, #0e0526 40%, #1a0840 100%)"
+            accentColor="#a78bfa"
+          >
+            <div className="p-10 md:p-14">
+              <div className="flex items-center gap-4 mb-10">
+                <span className="font-mono text-[10px] text-primary uppercase tracking-[0.3em]">// The Pulse</span>
+                <div className="h-px bg-white/10 flex-1" />
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+                {dynamicStats.map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.08 }}
+                    className="flex flex-col gap-3"
+                  >
+                    <span className="font-mono text-[10px] text-white/25 uppercase tracking-widest">{stat.tag}</span>
+                    <p className="font-display text-5xl md:text-6xl text-white">{stat.val}</p>
+                    <p className="font-mono text-xs text-primary uppercase tracking-[0.2em]">{stat.label}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </GlareCard>
+        </motion.div>
+
         {/* ── Design DNA Cards (2 cards, arsenal removed) ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {designCards.map((col, i) => (
@@ -319,68 +364,86 @@ export default function AboutSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-6"
+          className="mb-16"
         >
-          <div className="flex items-center gap-4 mb-8">
-            <span className="font-mono text-[10px] text-primary uppercase tracking-[0.3em]">[ Career Timeline ]</span>
+          <div className="flex items-center gap-4 mb-10">
+            <span className="font-mono text-[10px] text-primary uppercase tracking-[0.3em]">// Career History</span>
             <div className="h-px bg-white/10 flex-1" />
-            <span className="font-mono text-[10px] text-white/25 uppercase tracking-widest">2024 — Present</span>
           </div>
 
-          {/* Flowing Menu Timeline */}
-          <div
-            className="rounded-3xl overflow-hidden"
-            style={{
-              border: '1px solid rgba(255,255,255,0.07)',
-              background: 'linear-gradient(135deg, #1e0b3e 0%, #0e0526 40%, #1a0840 100%)',
-              minHeight: '420px',
-            }}
-          >
-            {/* Top accent line */}
-            <div
-              className="h-px w-full"
-              style={{ background: 'linear-gradient(90deg, transparent, #a78bfa, transparent)' }}
-            />
-            <FlowingMenu
-              items={timelineItems}
-              speed={18}
-              textColor="#ffffff"
-              bgColor="transparent"
-              marqueeBgColor="#a78bfa"
-              marqueeTextColor="#080808"
-              borderColor="rgba(255,255,255,0.08)"
-            />
-          </div>
-
-          {/* Timeline detail rows below FlowingMenu */}
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col">
             {timelineItems.map((item, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="flex gap-4 p-5 rounded-2xl"
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="group relative flex flex-col md:flex-row md:items-baseline justify-between py-10 gap-4 md:gap-12"
                 style={{
-                  background: 'rgba(167,139,250,0.04)',
-                  border: '1px solid rgba(167,139,250,0.12)',
+                  borderTop: i === 0 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                  borderBottom: '1px solid rgba(255,255,255,0.05)',
                 }}
               >
-                <div
-                  className="w-1 rounded-full flex-shrink-0 mt-1"
-                  style={{ background: 'linear-gradient(180deg, #a78bfa, #818cf8)', minHeight: '80px' }}
-                />
-                <div>
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="font-mono text-[10px] text-primary uppercase tracking-widest">{item.period}</span>
-                    <span className="font-mono text-[10px] text-white/20 uppercase tracking-widest">{item.role}</span>
-                  </div>
-                  <h4 className="font-display text-lg uppercase tracking-tight text-white mb-2">
-                    {item.text.split('—')[0].trim()}
-                  </h4>
-                  <p className="text-white/40 text-xs leading-relaxed font-body">{item.desc}</p>
+                {/* 1px Accent Left Line on Hover */}
+                <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-primary scale-y-0 origin-top group-hover:scale-y-100 transition-transform duration-500 ease-out" />
+                
+                {/* Left Column: Date */}
+                <div className="md:w-1/4 shrink-0 px-4 md:px-6">
+                  <span className="font-mono text-xs text-white/40 tracking-widest">{item.period}</span>
                 </div>
+
+                {/* Right Column: Content */}
+                <div className="md:w-3/4 flex flex-col gap-3 px-4 md:px-0 pr-4 md:pr-8">
+                  <h4 className="font-display text-2xl md:text-3xl uppercase tracking-tight text-white group-hover:text-primary transition-colors duration-300">
+                    {item.role} <span className="text-white/20 px-2">|</span> <span className="text-white/60">{item.company}</span>
+                  </h4>
+                  <p className="text-white/50 text-sm md:text-base leading-relaxed font-body max-w-2xl">
+                    {item.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ── My Arsenal (Toolkit) ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-16"
+        >
+          <div className="flex items-center gap-4 mb-10">
+            <span className="font-mono text-[10px] text-white/25 uppercase tracking-[0.3em]">// Technical Arsenal</span>
+            <div className="h-px bg-white/10 flex-1" />
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {toolkitItems.map((tool, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.05 }}
+              >
+                <GlareCard
+                  gradient="linear-gradient(135deg, rgba(30,11,62,0.4) 0%, rgba(14,5,38,0.4) 100%)"
+                  accentColor="#a78bfa"
+                  className="h-full group"
+                >
+                  <div className="p-8 flex flex-col items-center justify-center text-center gap-4 min-h-[160px]">
+                    <tool.Icon size={28} className="text-primary group-hover:text-white transition-colors duration-300" strokeWidth={1} />
+                    <h5 className="font-display text-lg uppercase tracking-wider text-white">
+                      {tool.name}
+                    </h5>
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">
+                      {tool.category}
+                    </span>
+                  </div>
+                </GlareCard>
               </motion.div>
             ))}
           </div>
@@ -466,41 +529,7 @@ export default function AboutSection() {
           </div>
         </motion.div>
 
-        {/* ── The Pulse (Metrics) ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <GlareCard
-            gradient="linear-gradient(135deg, #1e0b3e 0%, #0e0526 40%, #1a0840 100%)"
-            accentColor="#a78bfa"
-          >
-            <div className="p-10 md:p-14">
-              <div className="flex items-center gap-4 mb-10">
-                <span className="font-mono text-[10px] text-primary uppercase tracking-[0.3em]">// The Pulse</span>
-                <div className="h-px bg-white/10 flex-1" />
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-                {stats.map((stat, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.08 }}
-                    className="flex flex-col gap-3"
-                  >
-                    <span className="font-mono text-[10px] text-white/25 uppercase tracking-widest">{stat.tag}</span>
-                    <p className="font-display text-5xl md:text-6xl text-white">{stat.val}</p>
-                    <p className="font-mono text-xs text-primary uppercase tracking-[0.2em]">{stat.label}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </GlareCard>
-        </motion.div>
+
 
         <div
           className="h-px w-full mt-20"

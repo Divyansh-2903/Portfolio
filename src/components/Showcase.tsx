@@ -3,9 +3,9 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { ArrowUpRight, Play, Code2, Film, Layers } from 'lucide-react';
 
 /* ─── Types ─────────────────────────────────────────── */
-type Category = 'fullstack' | 'video';
+export type Category = 'fullstack' | 'video';
 
-interface Project {
+export interface Project {
   id: string;
   title: string;
   subtitle: string;
@@ -21,7 +21,7 @@ interface Project {
 }
 
 /* ─── Project Data ───────────────────────────────────── */
-const projects: Project[] = [
+export const projects: Project[] = [
   /* ── Fullstack ── */
   {
     id: 'onecliphub',

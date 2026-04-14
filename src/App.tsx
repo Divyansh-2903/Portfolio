@@ -13,7 +13,6 @@ import LoadingScreen from './components/LoadingScreen';
 import GlobalElements from './components/GlobalElements';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import Services from './components/Services';
 import AboutSection from './components/AboutSection';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -52,7 +51,6 @@ const About: React.FC = () => {
       className="relative z-10 pt-20 pb-24"
     >
       <AboutSection />
-      <Services />
     </motion.main>
   );
 }

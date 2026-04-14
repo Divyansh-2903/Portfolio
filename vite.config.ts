@@ -23,10 +23,12 @@ export default defineConfig(({mode}) => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks: {
-            'three-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
-            'framer-vendor': ['framer-motion'],
-            'ui-vendor': ['lucide-react', 'lenis', 'clsx', 'tailwind-merge'],
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('three') || id.includes('@react-three')) return 'vendor-three';
+              if (id.includes('framer-motion')) return 'vendor-framer';
+              return 'vendor';
+            }
           },
         },
       },

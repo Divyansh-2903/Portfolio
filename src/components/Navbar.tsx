@@ -31,35 +31,29 @@ const Navbar = React.memo(function Navbar() {
     e.preventDefault();
     setMobileMenuOpen(false);
     
-    // If it's a hash link (e.g. #contact), scroll to it if on Home
+    // Hash link handling (e.g. #contact)
     if (href.startsWith('/#')) {
+      const id = href.substring(1); // #contact or some id
       if (location.pathname !== '/') {
         navigate('/');
         setTimeout(() => {
-          // lenis scroll to won't work immediately after navigate since DOM might need a tick
-          const id = href.substring(1); // #contact
-          if (lenis) {
-            lenis.scrollTo(id, { offset: -80 });
-          } else {
-            document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
-          }
-        }, 200);
+          if (lenis) lenis.scrollTo(id, { offset: -80 });
+          else document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
       } else {
-        const id = href.substring(1);
-        if (lenis) {
-          lenis.scrollTo(id, { offset: -80 });
-        } else {
-          document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
-        }
+        if (lenis) lenis.scrollTo(id, { offset: -80 });
+        else document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
       }
-    } else if (href === '/') {
-      if (location.pathname === '/') {
-        if (lenis) lenis.scrollTo(0, { offset: -80 });
-        else window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-         navigate(href);
-      }
+      return;
+    }
+
+    // Regular link handling
+    if (location.pathname === href) {
+      // Already on the page, force scroll to top
+      if (lenis) lenis.scrollTo(0, { immediate: false });
+      else window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
+      // Navigate to new page
       navigate(href);
     }
   };

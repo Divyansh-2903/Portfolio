@@ -7,18 +7,21 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type {} from 'framer-motion'; // keep tree-shaking clean
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useLenis } from 'lenis/react';
 
 // Utility for suspense fallbacks
 const LoadingFallback = () => null;
 
 // Lazy Load Components
-const LoadingScreen = lazy(() => import('./components/LoadingScreen'));
-const GlobalElements = lazy(() => import('./components/GlobalElements'));
-const Navbar = lazy(() => import('./components/Navbar'));
+import Navbar from './components/Navbar';
+import LoadingScreen from './components/LoadingScreen';
+import GlobalElements from './components/GlobalElements';
+import Footer from './components/Footer';
+
+// Lazy Load Pages only
 const Hero = lazy(() => import('./components/Hero'));
 const AboutSection = lazy(() => import('./components/AboutSection'));
 const Contact = lazy(() => import('./components/Contact'));
-const Footer = lazy(() => import('./components/Footer'));
 const Story = lazy(() => import('./components/Story'));
 const Showcase = lazy(() => import('./components/Showcase'));
 const GradualBlur = lazy(() => import('./components/GradualBlur'));
@@ -26,6 +29,22 @@ const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
 
 // Heavy Canvas components
 const LaserFlow = lazy(() => import('./components/canvas/LaserFlow'));
+
+// Global Scroll Reset
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  const lenis = useLenis();
+
+  useEffect(() => {
+    if (lenis) {
+      lenis.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, lenis]);
+
+  return null;
+}
 
 const Home: React.FC = () => {
   return (
@@ -98,32 +117,34 @@ const Work: React.FC = () => {
   );
 }
 
-
-
 function AppContent() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <>
+      <ScrollToTop />
+      
       <div className="fixed inset-0 z-0 w-full h-full pointer-events-none">
-        <LaserFlow
-          horizontalSizing={2.5}
-          verticalSizing={20}
-          wispDensity={1.5}
-          wispSpeed={20}
-          wispIntensity={5}
-          flowSpeed={0.5}
-          flowStrength={0.4}
-          fogIntensity={0.35}
-          fogScale={0.4}
-          fogFallSpeed={0.8}
-          decay={1}
-          falloffStart={2}
-          color="#A78BFA"
-          horizontalBeamOffset={0}
-          verticalBeamOffset={-0.3}
-        />
+        <Suspense fallback={null}>
+          <LaserFlow
+            horizontalSizing={2.5}
+            verticalSizing={20}
+            wispDensity={1.5}
+            wispSpeed={20}
+            wispIntensity={5}
+            flowSpeed={0.5}
+            flowStrength={0.4}
+            fogIntensity={0.35}
+            fogScale={0.4}
+            fogFallSpeed={0.8}
+            decay={1}
+            falloffStart={2}
+            color="#A78BFA"
+            horizontalBeamOffset={0}
+            verticalBeamOffset={-0.3}
+          />
+        </Suspense>
       </div>
 
       <AnimatePresence mode="wait">
@@ -131,19 +152,20 @@ function AppContent() {
       </AnimatePresence>
 
       {!loading && (
-        <Suspense fallback={<LoadingFallback />}>
+        <>
           <GlobalElements />
-
           <Navbar />
           
           <AnimatePresence mode="wait">
             <motion.div key={location.pathname}>
-              <Routes location={location}>
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/work" element={<Work />} />
-                <Route path="/work/:id" element={<CaseStudyDetail />} />
-              </Routes>
+              <Suspense fallback={<LoadingFallback />}>
+                <Routes location={location}>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/work" element={<Work />} />
+                  <Route path="/work/:id" element={<CaseStudyDetail />} />
+                </Routes>
+              </Suspense>
             </motion.div>
           </AnimatePresence>
 
@@ -152,10 +174,12 @@ function AppContent() {
           {/* Sticky "Available" CTA */}
           <StickyCTA />
 
-          <GlobalVignette />
-        </Suspense>
+          <Suspense fallback={null}>
+            <GlobalVignette />
+          </Suspense>
+        </>
       )}
-    </Suspense>
+    </>
   );
 }
 

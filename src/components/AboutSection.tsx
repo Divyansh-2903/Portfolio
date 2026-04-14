@@ -138,7 +138,7 @@ function GlareCard({
   const translateY = useTransform(springY, (vy) => vy - 300);
 
   const handleMove = (e: React.MouseEvent) => {
-    if (!ref.current) return;
+    if (!ref.current || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     const r = ref.current.getBoundingClientRect();
     x.set(e.clientX - r.left);
     y.set(e.clientY - r.top);
@@ -147,7 +147,7 @@ function GlareCard({
   return (
     <div
       ref={ref}
-      onMouseEnter={() => opacity.set(1)}
+      onMouseEnter={() => { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) opacity.set(1); }}
       onMouseLeave={() => opacity.set(0)}
       onMouseMove={handleMove}
       className={`relative rounded-3xl overflow-hidden ${className}`}

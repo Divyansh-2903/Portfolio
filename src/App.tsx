@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 import type {} from 'framer-motion'; // keep tree-shaking clean
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
@@ -291,7 +291,9 @@ function GlobalVignette() {
 export default function App() {
   return (
     <Router>
-      <AppContent />
+      <MotionConfig reducedMotion="user">
+        <AppContent />
+      </MotionConfig>
     </Router>
   );
 }

@@ -39,7 +39,7 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
   const translateY = useTransform(springY, y => y - 300);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     const rect = cardRef.current.getBoundingClientRect();
     mouseX.set(e.clientX - rect.left);
     mouseY.set(e.clientY - rect.top);
@@ -51,7 +51,7 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
       initial={{ opacity: 0, y: 60, scale: 0.98 }}
       animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
       transition={{ type: "spring", damping: 30, stiffness: 220, delay: index * 0.08 }}
-      onMouseEnter={() => { glareOpacity.set(1); setHovered(true); }}
+      onMouseEnter={() => { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) { glareOpacity.set(1); setHovered(true); } }}
       onMouseLeave={() => { glareOpacity.set(0); setHovered(false); }}
       onMouseMove={handleMouseMove}
       className="group relative rounded-3xl overflow-hidden cursor-pointer"
@@ -193,7 +193,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
   const translateY = useTransform(springY, y => y - 400);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
+    if (!ref.current || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     const rect = ref.current.getBoundingClientRect();
     mouseX.set(e.clientX - rect.left);
     mouseY.set(e.clientY - rect.top);
@@ -205,7 +205,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
       initial={{ opacity: 0, y: 60, scale: 0.98 }}
       animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
       transition={{ type: "spring", damping: 32, stiffness: 200 }}
-      onMouseEnter={() => { glareOpacity.set(1); setHovered(true); }}
+      onMouseEnter={() => { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) { glareOpacity.set(1); setHovered(true); } }}
       onMouseLeave={() => { glareOpacity.set(0); setHovered(false); }}
       onMouseMove={handleMouseMove}
       className="relative col-span-full rounded-3xl overflow-hidden cursor-pointer"

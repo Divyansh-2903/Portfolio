@@ -9,8 +9,8 @@ import type {} from 'framer-motion'; // keep tree-shaking clean
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 
-// Utility for suspense fallbacks
-const LoadingFallback = () => null;
+// Utility for suspense fallbacks (prevents footer from flashing up during lazy load)
+const LoadingFallback = () => <div className="min-h-screen" />;
 
 // Lazy Load Components
 import Navbar from './components/Navbar';

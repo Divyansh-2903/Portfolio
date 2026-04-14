@@ -43,13 +43,14 @@ const Navbar = React.memo(function Navbar() {
       const id = href.substring(1); // #contact or some id
       if (location.pathname !== '/') {
         navigate('/');
+        // Use a short timeout to let the fast route change happen
         setTimeout(() => {
-          if (lenis) lenis.scrollTo(id, { offset: -80 });
-          else document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+          if (lenis) lenis.scrollTo(id, { offset: -80, immediate: true });
+          else document.querySelector(id)?.scrollIntoView({ behavior: 'instant' });
+        }, 50);
       } else {
-        if (lenis) lenis.scrollTo(id, { offset: -80 });
-        else document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
+        if (lenis) lenis.scrollTo(id, { offset: -80, immediate: true });
+        else document.querySelector(id)?.scrollIntoView({ behavior: 'instant' });
       }
       return;
     }

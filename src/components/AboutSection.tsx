@@ -124,51 +124,60 @@ function GlareCard({
   accentColor: string;
   className?: string;
 }) {
-  const [hovered, setHovered] = useState(false);
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const ref = useRef<HTMLDivElement>(null);
+  
+  // High-performance tracking (no re-renders)
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const opacity = useMotionValue(0);
+  
+  const springX = useSpring(x, { stiffness: 300, damping: 30 });
+  const springY = useSpring(y, { stiffness: 300, damping: 30 });
 
   const handleMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
     const r = ref.current.getBoundingClientRect();
-    setMouse({ x: e.clientX - r.left, y: e.clientY - r.top });
+    x.set(e.clientX - r.left);
+    y.set(e.clientY - r.top);
   };
+
+  const glareBackground = useTransform(
+    [springX, springY],
+    ([vx, vy]) => `radial-gradient(circle 300px at ${vx}px ${vy}px, rgba(255,255,255,0.14), transparent 70%)`
+  );
 
   return (
     <div
       ref={ref}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => opacity.set(1)}
+      onMouseLeave={() => opacity.set(0)}
       onMouseMove={handleMove}
       className={`relative rounded-3xl overflow-hidden ${className}`}
       style={{
         background: gradient,
-        border: `1px solid ${hovered ? accentColor + '40' : 'rgba(255,255,255,0.07)'}`,
-        boxShadow: hovered
-          ? `0 0 60px ${accentColor}22, 0 24px 60px rgba(0,0,0,0.5)`
-          : '0 8px 40px rgba(0,0,0,0.4)',
-        transition: 'box-shadow 0.4s ease, border-color 0.3s ease',
+        transition: 'all 0.4s ease',
       }}
     >
       <div
         className="absolute inset-x-0 top-0 h-px transition-opacity duration-500"
         style={{
           background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
-          opacity: hovered ? 1 : 0.3,
         }}
       />
-      <div
-        className="absolute inset-0 pointer-events-none mix-blend-overlay transition-opacity duration-300"
+      
+      {/* Glare effect powered by MotionValues */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none mix-blend-overlay"
         style={{
-          opacity: hovered ? 1 : 0,
-          background: `radial-gradient(circle 300px at ${mouse.x}px ${mouse.y}px, rgba(255,255,255,0.14), transparent 70%)`,
+          opacity,
+          background: glareBackground,
         }}
       />
+
       <div
         className="absolute -top-16 -right-16 w-48 h-48 rounded-full pointer-events-none transition-opacity duration-500"
         style={{
           background: `radial-gradient(circle, ${accentColor}22 0%, transparent 70%)`,
-          opacity: hovered ? 1 : 0.4,
         }}
       />
       <div className="relative z-10">{children}</div>
@@ -192,6 +201,63 @@ function ParallaxImage({ src, alt, className }: { src: string; alt: string; clas
     </div>
   );
 }
+
+/* ─── Memoized Sub-components ───────────────────────────────── */
+const TechToolItem = React.memo(({ tool, index }: { tool: typeof TOOLKIT_ITEMS[0]; index: number }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.85 }}
+    whileInView={{ opacity: 1, scale: 1 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.45, delay: index * 0.05 }}
+    className="group flex flex-col items-center gap-3 p-5 rounded-2xl cursor-default"
+    style={{
+      background: 'rgba(255,255,255,0.03)',
+      border: '1px solid rgba(255,255,255,0.06)',
+      transition: 'background 0.3s, border-color 0.3s, transform 0.3s',
+    }}
+    whileHover={{ scale: 1.08, y: -4 }}
+  >
+    <div 
+      className="flex items-center justify-center"
+      style={{ color: tool.color, filter: `drop-shadow(0 0 10px ${tool.color}77)` }}
+    >
+      <tool.Icon size={36} />
+    </div>
+    <span className="font-mono text-[10px] uppercase tracking-wider text-white/50 group-hover:text-white/80 transition-colors text-center leading-tight">
+      {tool.name}
+    </span>
+  </motion.div>
+));
+TechToolItem.displayName = 'TechToolItem';
+
+const DesignDNACard = React.memo(({ col, i, IconComponent }: { col: any; i: number; IconComponent: any }) => (
+  <motion.div
+    key={col.num || i}
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: '-60px' }}
+    transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+  >
+    <GlareCard gradient={col.gradient} accentColor={col.accent} className="h-full">
+      <div className="p-8 flex flex-col h-full min-h-[220px]">
+        <div className="flex items-center justify-between mb-6">
+          <span className="font-mono text-[10px] uppercase tracking-[0.25em]" style={{ color: col.accent }}>
+            {col.num} // {col.tag}
+          </span>
+          <div
+            className="w-8 h-8 rounded-xl flex items-center justify-center"
+            style={{ background: `${col.accent}15`, border: `1px solid ${col.accent}30` }}
+          >
+            <IconComponent size={14} style={{ color: col.accent }} />
+          </div>
+        </div>
+        <h3 className="font-display text-2xl uppercase tracking-tight text-white mb-4">{col.title}</h3>
+        <p className="text-white/45 text-sm leading-relaxed font-body flex-1">{col.body}</p>
+      </div>
+    </GlareCard>
+  </motion.div>
+));
+DesignDNACard.displayName = 'DesignDNACard';
 
 /* ─── Main Component ─────────────────────────────────────────── */
 export default function AboutSection() {
@@ -380,34 +446,11 @@ export default function AboutSection() {
           {aboutData.designCards.map((col: any, i: number) => {
             const IconComponent = iconMap[col.iconName] || ExternalLink;
             return (
-              <motion.div
-                key={col.num || i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <GlareCard gradient={col.gradient} accentColor={col.accent} className="h-full">
-                  <div className="p-8 flex flex-col h-full min-h-[220px]">
-                    <div className="flex items-center justify-between mb-6">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.25em]" style={{ color: col.accent }}>
-                        {col.num} // {col.tag}
-                      </span>
-                      <div
-                        className="w-8 h-8 rounded-xl flex items-center justify-center"
-                        style={{ background: `${col.accent}15`, border: `1px solid ${col.accent}30` }}
-                      >
-                        <IconComponent size={14} style={{ color: col.accent }} />
-                      </div>
-                    </div>
-                    <h3 className="font-display text-2xl uppercase tracking-tight text-white mb-4">{col.title}</h3>
-                    <p className="text-white/45 text-sm leading-relaxed font-body flex-1">{col.body}</p>
-                  </div>
-                </GlareCard>
-              </motion.div>
-            )
+              <DesignDNACard key={col.num || i} col={col} i={i} IconComponent={IconComponent} />
+            );
           })}
         </div>
+
 
         {/* ── Work Timeline ── */}
         <motion.div
@@ -585,30 +628,7 @@ export default function AboutSection() {
 
           <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-4">
             {TOOLKIT_ITEMS.map((tool, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.85 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.05 }}
-                className="group flex flex-col items-center gap-3 p-5 rounded-2xl cursor-default"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  transition: 'background 0.3s, border-color 0.3s, transform 0.3s',
-                }}
-                whileHover={{ scale: 1.08, y: -4 }}
-              >
-                <div 
-                  className="flex items-center justify-center"
-                  style={{ color: tool.color, filter: `drop-shadow(0 0 10px ${tool.color}77)` }}
-                >
-                  <tool.Icon size={36} />
-                </div>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-white/50 group-hover:text-white/80 transition-colors text-center leading-tight">
-                  {tool.name}
-                </span>
-              </motion.div>
+              <TechToolItem key={i} tool={tool} index={i} />
             ))}
           </div>
         </motion.div>

@@ -25,17 +25,26 @@ MetricChip.displayName = 'MetricChip';
 const ProjectCard = React.memo(({ project, index }: { project: Project; index: number; key?: React.Key }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const inView = useInView(cardRef, { once: true, margin: '-80px' });
-  const [hovered, setHovered] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+  // High-performance tracking
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const glareOpacity = useMotionValue(0);
+  
+  const springX = useSpring(mouseX, { stiffness: 300, damping: 30 });
+  const springY = useSpring(mouseY, { stiffness: 300, damping: 30 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
+    mouseX.set(e.clientX - rect.left);
+    mouseY.set(e.clientY - rect.top);
   };
+
+  const glareBackground = useTransform(
+    [springX, springY],
+    ([x, y]) => `radial-gradient(circle 300px at ${x}px ${y}px, rgba(255,255,255,0.15), transparent 70%)`
+  );
 
   return (
     <motion.div
@@ -43,17 +52,15 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
       initial={{ opacity: 0, y: 60 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => glareOpacity.set(1)}
+      onMouseLeave={() => glareOpacity.set(0)}
       onMouseMove={handleMouseMove}
       className="group relative rounded-3xl overflow-hidden cursor-pointer"
       style={{
         background: project.gradient,
-        boxShadow: hovered
-          ? `0 0 60px ${project.accentColor}25, 0 24px 60px rgba(0,0,0,0.5)`
-          : '0 8px 40px rgba(0,0,0,0.4)',
-        transition: 'box-shadow 0.4s ease',
-        border: `1px solid ${hovered ? project.accentColor + '40' : 'rgba(255,255,255,0.06)'}`,
+        boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
+        transition: 'all 0.4s ease',
+        border: '1px solid rgba(255,255,255,0.06)',
       }}
     >
       {/* Animated top-edge accent line */}
@@ -61,7 +68,6 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
         className="absolute top-0 left-0 right-0 h-px transition-opacity duration-500"
         style={{
           background: `linear-gradient(90deg, transparent, ${project.accentColor}, transparent)`,
-          opacity: hovered ? 1 : 0.3,
         }}
       />
 
@@ -70,16 +76,15 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
         className="absolute -top-20 -right-20 w-60 h-60 rounded-full pointer-events-none transition-opacity duration-500"
         style={{
           background: `radial-gradient(circle, ${project.accentColor}20 0%, transparent 70%)`,
-          opacity: hovered ? 1 : 0.4,
         }}
       />
 
-      {/* Glare effect */}
-      <div
-        className="absolute inset-0 pointer-events-none transition-opacity duration-300 mix-blend-overlay"
+      {/* Glare effect powered by MotionValues */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none mix-blend-overlay"
         style={{
-          opacity: hovered ? 1 : 0,
-          background: `radial-gradient(circle 300px at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.15), transparent 70%)`,
+          opacity: glareOpacity,
+          background: glareBackground,
         }}
       />
 
@@ -169,17 +174,26 @@ ProjectCard.displayName = 'ProjectCard';
 const FeaturedCard = React.memo(({ project }: { project: Project }) => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
-  const [hovered, setHovered] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+  // High-performance tracking
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const glareOpacity = useMotionValue(0);
+  
+  const springX = useSpring(mouseX, { stiffness: 300, damping: 30 });
+  const springY = useSpring(mouseY, { stiffness: 300, damping: 30 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
+    mouseX.set(e.clientX - rect.left);
+    mouseY.set(e.clientY - rect.top);
   };
+
+  const glareBackground = useTransform(
+    [springX, springY],
+    ([x, y]) => `radial-gradient(circle 400px at ${x}px ${y}px, rgba(255,255,255,0.15), transparent 70%)`
+  );
 
   return (
     <motion.div
@@ -187,17 +201,15 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
       initial={{ opacity: 0, y: 80 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => glareOpacity.set(1)}
+      onMouseLeave={() => glareOpacity.set(0)}
       onMouseMove={handleMouseMove}
       className="relative col-span-full rounded-3xl overflow-hidden cursor-pointer"
       style={{
         background: project.gradient,
         minHeight: '420px',
-        border: `1px solid ${hovered ? project.accentColor + '50' : 'rgba(255,255,255,0.07)'}`,
-        boxShadow: hovered
-          ? `0 0 100px ${project.accentColor}20, 0 32px 80px rgba(0,0,0,0.6)`
-          : '0 16px 60px rgba(0,0,0,0.5)',
+        border: '1px solid rgba(255,255,255,0.07)',
+        boxShadow: '0 16px 60px rgba(0,0,0,0.5)',
         transition: 'all 0.5s ease',
       }}
     >
@@ -226,16 +238,15 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
         className="absolute top-0 left-0 right-0 h-px transition-opacity duration-500"
         style={{
           background: `linear-gradient(90deg, transparent, ${project.accentColor}80, transparent)`,
-          opacity: hovered ? 1 : 0.6,
         }}
       />
 
-      {/* Glare effect */}
-      <div
-        className="absolute inset-0 pointer-events-none transition-opacity duration-300 mix-blend-overlay"
+      {/* Glare effect powered by MotionValues */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none mix-blend-overlay"
         style={{
-          opacity: hovered ? 1 : 0,
-          background: `radial-gradient(circle 400px at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.15), transparent 70%)`,
+          opacity: glareOpacity,
+          background: glareBackground,
         }}
       />
 

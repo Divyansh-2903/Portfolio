@@ -47,16 +47,24 @@ const socials = [
 
 /* ─── Social Card ────────────────────────────────────────── */
 function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: string | number }) {
-  const [hovered, setHovered] = useState(false);
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const [copied, setCopied] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLAnchorElement>(null);
   const isEmail = s.label === 'Email';
+
+  // Performance tracking
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const opacity = useMotionValue(0);
+  
+  const springX = useSpring(x, { stiffness: 300, damping: 30 });
+  const springY = useSpring(y, { stiffness: 300, damping: 30 });
 
   const handleMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
     const r = ref.current.getBoundingClientRect();
-    setMouse({ x: e.clientX - r.left, y: e.clientY - r.top });
+    x.set(e.clientX - r.left);
+    y.set(e.clientY - r.top);
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -79,17 +87,21 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: 0.06 * index, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => {
+        setHovered(true);
+        opacity.set(1);
+      }}
+      onMouseLeave={() => {
+        setHovered(false);
+        opacity.set(0);
+      }}
       onMouseMove={handleMove}
       className="relative group flex items-center gap-4 p-5 rounded-2xl cursor-pointer overflow-hidden"
       style={{
         background: s.gradient,
-        border: `1px solid ${hovered ? s.accentColor + '50' : 'rgba(255,255,255,0.06)'}`,
-        boxShadow: hovered
-          ? `0 0 50px ${s.accentColor}20, 0 16px 48px rgba(0,0,0,0.5)`
-          : '0 8px 32px rgba(0,0,0,0.4)',
-        transition: 'box-shadow 0.4s ease, border-color 0.3s ease',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+        transition: 'all 0.4s ease',
+        border: '1px solid rgba(255,255,255,0.06)',
       }}
     >
       {/* Top accent line */}
@@ -97,15 +109,12 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
         className="absolute inset-x-0 top-0 h-px transition-opacity duration-400"
         style={{
           background: `linear-gradient(90deg, transparent, ${s.accentColor}, transparent)`,
-          opacity: hovered ? 1 : 0.25,
-        }}
-      />
-      {/* Glare */}
-      <div
-        className="absolute inset-0 pointer-events-none mix-blend-overlay transition-opacity duration-300"
+      {/* Glare effect powered by MotionValues */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none mix-blend-overlay"
         style={{
-          opacity: hovered ? 1 : 0,
-          background: `radial-gradient(circle 200px at ${mouse.x}px ${mouse.y}px, rgba(255,255,255,0.12), transparent 70%)`,
+          opacity,
+          background: glareBackground,
         }}
       />
       {/* Ambient top-right glow */}
@@ -144,7 +153,7 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
       <div className="relative z-10 flex-1 min-w-0">
         <p
           className="text-sm font-semibold leading-none mb-1 transition-colors duration-300"
-          style={{ color: (isEmail && copied) ? '#22c55e' : hovered ? s.accentColor : 'rgba(255,255,255,0.85)' }}
+          style={{ color: (isEmail && copied) ? '#22c55e' : (hovered ? s.accentColor : 'rgba(255,255,255,0.85)') }}
         >
           {isEmail && copied ? 'Copied!' : s.label}
         </p>

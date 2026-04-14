@@ -429,6 +429,15 @@ export const LaserFlow: React.FC<Props> = ({
     };
     document.addEventListener('visibilitychange', onVis, { passive: true });
 
+    // ── INTERSECTION OBSERVER OPTIMIZATION ──
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        pausedRef.current = !entry.isIntersecting || document.hidden;
+      },
+      { threshold: 0.01 } // Pause even if just 1% is visible (aggressive)
+    );
+    observer.observe(mount);
+
     const updateMouse = (clientX: number, clientY: number) => {
       const rect = rectRef.current;
       if (!rect) return;
@@ -538,6 +547,7 @@ export const LaserFlow: React.FC<Props> = ({
       if (resizeRaf) cancelAnimationFrame(resizeRaf);
 
       ro.disconnect();
+      observer.disconnect();
       document.removeEventListener('visibilitychange', onVis);
       canvas.removeEventListener('pointermove', onMove as any);
       canvas.removeEventListener('pointerdown', onMove as any);

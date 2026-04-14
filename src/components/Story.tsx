@@ -172,21 +172,22 @@ function Panel({
   const numOpacity = useTransform(smoothProgress, [start, mid - 0.04], [0, 1], { clamp: true });
   const numY       = useTransform(smoothProgress, [start, mid - 0.06], [20, 0], { clamp: true });
 
-  /* Word-level reveal thresholds — RAW progress for immediate scroll response */
-  const words = buildWords(step.segments);
-  const revealWindow  = mid - start;
-  const nonSpaceCount = words.filter((w) => !/^\s+$/.test(w.text)).length;
-  const totalNS       = Math.max(nonSpaceCount - 1, 1);
-  let wIdx = 0;
-
-  const wordReveal = words.map((w) => {
-    if (/^\s+$/.test(w.text)) return { revealStart: start, revealEnd: start };
-    const t           = wIdx++ / totalNS;
-    // Push the reveal start forward slightly so panel finishes fading in before words reveal
-    const revealStart = start + 0.02 + t * (revealWindow - 0.02) * 0.85;
-    const revealEnd   = revealStart + (revealWindow - 0.02) * 0.15;
-    return { revealStart, revealEnd };
-  });
+  const { words, wordReveal } = React.useMemo(() => {
+    const ws = buildWords(step.segments);
+    const revealWin = mid - start;
+    const nsCount = ws.filter((w) => !/^\s+$/.test(w.text)).length;
+    const tNS = Math.max(nsCount - 1, 1);
+    let idx = 0;
+    
+    const wr = ws.map((w) => {
+      if (/^\s+$/.test(w.text)) return { revealStart: start, revealEnd: start };
+      const t = idx++ / tNS;
+      const rStart = start + 0.02 + t * (revealWin - 0.02) * 0.85;
+      const rEnd = rStart + (revealWin - 0.02) * 0.15;
+      return { revealStart: rStart, revealEnd: rEnd };
+    });
+    return { words: ws, wordReveal: wr };
+  }, [step.segments, start, mid]);
 
   const accentGradient: React.CSSProperties = {
     WebkitTextFillColor: 'transparent',

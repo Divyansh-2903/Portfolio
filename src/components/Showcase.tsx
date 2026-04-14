@@ -25,6 +25,7 @@ MetricChip.displayName = 'MetricChip';
 const ProjectCard = React.memo(({ project, index }: { project: Project; index: number; key?: React.Key }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const inView = useInView(cardRef, { once: true, margin: '-80px' });
+  const [hovered, setHovered] = useState(false);
   
   // High-performance tracking
   const mouseX = useMotionValue(0);
@@ -52,8 +53,8 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
       initial={{ opacity: 0, y: 60 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      onMouseEnter={() => glareOpacity.set(1)}
-      onMouseLeave={() => glareOpacity.set(0)}
+      onMouseEnter={() => { glareOpacity.set(1); setHovered(true); }}
+      onMouseLeave={() => { glareOpacity.set(0); setHovered(false); }}
       onMouseMove={handleMouseMove}
       className="group relative rounded-3xl overflow-hidden cursor-pointer"
       style={{
@@ -174,6 +175,7 @@ ProjectCard.displayName = 'ProjectCard';
 const FeaturedCard = React.memo(({ project }: { project: Project }) => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
+  const [hovered, setHovered] = useState(false);
   
   // High-performance tracking
   const mouseX = useMotionValue(0);
@@ -201,8 +203,8 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
       initial={{ opacity: 0, y: 80 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-      onMouseEnter={() => glareOpacity.set(1)}
-      onMouseLeave={() => glareOpacity.set(0)}
+      onMouseEnter={() => { glareOpacity.set(1); setHovered(true); }}
+      onMouseLeave={() => { glareOpacity.set(0); setHovered(false); }}
       onMouseMove={handleMouseMove}
       className="relative col-span-full rounded-3xl overflow-hidden cursor-pointer"
       style={{

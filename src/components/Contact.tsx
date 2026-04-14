@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { motion, useInView, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion';
 import { Mail, Linkedin, Github, MessageCircle, ArrowUpRight, Zap, Check, Copy } from 'lucide-react';
 
 /* ─── Custom Icons ────────────────────────────────────────── */
@@ -59,6 +59,7 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
   
   const springX = useSpring(x, { stiffness: 300, damping: 30 });
   const springY = useSpring(y, { stiffness: 300, damping: 30 });
+  const glareBackground = useMotionTemplate`radial-gradient(400px circle at ${springX}px ${springY}px, ${s.accentColor}30, transparent 80%)`;
 
   const handleMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
@@ -109,6 +110,8 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
         className="absolute inset-x-0 top-0 h-px transition-opacity duration-400"
         style={{
           background: `linear-gradient(90deg, transparent, ${s.accentColor}, transparent)`,
+        }}
+      />
       {/* Glare effect powered by MotionValues */}
       <motion.div
         className="absolute inset-0 pointer-events-none mix-blend-overlay"

@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { ArrowUpRight, Play, Code2, Film, Layers } from 'lucide-react';
 import { client } from '../lib/sanity';
 

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring } from 'framer-motion';
 import { Palette, Cpu, ExternalLink, BrainCircuit } from 'lucide-react';
 import { SiNextdotjs, SiTypescript, SiSupabase, SiTailwindcss, SiFigma, SiNodedotjs, SiReact, SiFramer, SiAnthropic } from 'react-icons/si';
 import { TbBrandOpenai } from 'react-icons/tb';

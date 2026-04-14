@@ -32,8 +32,11 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
   const mouseY = useMotionValue(0);
   const glareOpacity = useMotionValue(0);
   
-  const springX = useSpring(mouseX, { stiffness: 300, damping: 30 });
-  const springY = useSpring(mouseY, { stiffness: 300, damping: 30 });
+  const springX = useSpring(mouseX, { stiffness: 400, damping: 40 });
+  const springY = useSpring(mouseY, { stiffness: 400, damping: 40 });
+
+  const translateX = useTransform(springX, x => x - 300);
+  const translateY = useTransform(springY, y => y - 300);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -42,17 +45,12 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
     mouseY.set(e.clientY - rect.top);
   };
 
-  const glareBackground = useTransform(
-    [springX, springY],
-    ([x, y]) => `radial-gradient(circle 300px at ${x}px ${y}px, rgba(255,255,255,0.15), transparent 70%)`
-  );
-
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 60 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 60, scale: 0.98 }}
+      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
+      transition={{ type: "spring", damping: 30, stiffness: 220, delay: index * 0.08 }}
       onMouseEnter={() => { glareOpacity.set(1); setHovered(true); }}
       onMouseLeave={() => { glareOpacity.set(0); setHovered(false); }}
       onMouseMove={handleMouseMove}
@@ -60,8 +58,9 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
       style={{
         background: project.gradient,
         boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
-        transition: 'all 0.4s ease',
+        transition: 'border-color 0.4s ease, box-shadow 0.4s ease',
         border: '1px solid rgba(255,255,255,0.06)',
+        willChange: 'transform, opacity',
       }}
     >
       {/* Animated top-edge accent line */}
@@ -80,12 +79,17 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
         }}
       />
 
-      {/* Glare effect powered by MotionValues */}
+      {/* Glare effect powered by MotionValues mapped to translation */}
       <motion.div
-        className="absolute inset-0 pointer-events-none mix-blend-overlay"
+        className="absolute top-0 left-0 pointer-events-none mix-blend-overlay"
         style={{
+          width: 600,
+          height: 600,
+          x: translateX,
+          y: translateY,
           opacity: glareOpacity,
-          background: glareBackground,
+          background: 'radial-gradient(circle 300px at center, rgba(255,255,255,0.15), transparent 100%)',
+          willChange: 'transform, opacity'
         }}
       />
 
@@ -182,8 +186,11 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
   const mouseY = useMotionValue(0);
   const glareOpacity = useMotionValue(0);
   
-  const springX = useSpring(mouseX, { stiffness: 300, damping: 30 });
-  const springY = useSpring(mouseY, { stiffness: 300, damping: 30 });
+  const springX = useSpring(mouseX, { stiffness: 400, damping: 40 });
+  const springY = useSpring(mouseY, { stiffness: 400, damping: 40 });
+
+  const translateX = useTransform(springX, x => x - 400);
+  const translateY = useTransform(springY, y => y - 400);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
@@ -192,17 +199,12 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
     mouseY.set(e.clientY - rect.top);
   };
 
-  const glareBackground = useTransform(
-    [springX, springY],
-    ([x, y]) => `radial-gradient(circle 400px at ${x}px ${y}px, rgba(255,255,255,0.15), transparent 70%)`
-  );
-
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 80 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 60, scale: 0.98 }}
+      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
+      transition={{ type: "spring", damping: 32, stiffness: 200 }}
       onMouseEnter={() => { glareOpacity.set(1); setHovered(true); }}
       onMouseLeave={() => { glareOpacity.set(0); setHovered(false); }}
       onMouseMove={handleMouseMove}
@@ -212,7 +214,8 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
         minHeight: '420px',
         border: '1px solid rgba(255,255,255,0.07)',
         boxShadow: '0 16px 60px rgba(0,0,0,0.5)',
-        transition: 'all 0.5s ease',
+        transition: 'border-color 0.5s ease, box-shadow 0.5s ease',
+        willChange: 'transform, opacity',
       }}
     >
       {/* FEATURED label */}
@@ -243,12 +246,17 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
         }}
       />
 
-      {/* Glare effect powered by MotionValues */}
+      {/* Glare effect powered by MotionValues mapped to translation */}
       <motion.div
-        className="absolute inset-0 pointer-events-none mix-blend-overlay"
+        className="absolute top-0 left-0 pointer-events-none mix-blend-overlay"
         style={{
+          width: 800,
+          height: 800,
+          x: translateX,
+          y: translateY,
           opacity: glareOpacity,
-          background: glareBackground,
+          background: 'radial-gradient(circle 400px at center, rgba(255,255,255,0.15), transparent 100%)',
+          willChange: 'transform, opacity'
         }}
       />
 
@@ -391,10 +399,11 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
         {!hideHeader && (
         <motion.div
           ref={headerRef}
-          initial={{ opacity: 0, y: 40 }}
-          animate={headerInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
+          animate={headerInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+          transition={{ type: "spring", damping: 30, stiffness: 220 }}
           className="mb-16"
+          style={{ willChange: "transform, opacity" }}
         >
           <div className="flex items-center gap-4 mb-5">
             <span className="text-primary font-mono text-xs tracking-[0.3em] uppercase">
@@ -480,11 +489,12 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.98 }}
+            transition={{ type: "spring", damping: 25, stiffness: 220 }}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            style={{ willChange: "transform, opacity" }}
           >
             {/* Featured card — full width */}
             {featured && <FeaturedCard project={featured} />}
@@ -498,11 +508,12 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
 
         {/* ── Bottom CTA ── */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
           className="flex justify-center mt-20"
+          style={{ willChange: "transform, opacity" }}
         >
           <motion.a
             href="#contact"

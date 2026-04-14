@@ -131,8 +131,11 @@ function GlareCard({
   const y = useMotionValue(0);
   const opacity = useMotionValue(0);
   
-  const springX = useSpring(x, { stiffness: 300, damping: 30 });
-  const springY = useSpring(y, { stiffness: 300, damping: 30 });
+  const springX = useSpring(x, { stiffness: 400, damping: 40 });
+  const springY = useSpring(y, { stiffness: 400, damping: 40 });
+
+  const translateX = useTransform(springX, (vx) => vx - 300);
+  const translateY = useTransform(springY, (vy) => vy - 300);
 
   const handleMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
@@ -140,11 +143,6 @@ function GlareCard({
     x.set(e.clientX - r.left);
     y.set(e.clientY - r.top);
   };
-
-  const glareBackground = useTransform(
-    [springX, springY],
-    ([vx, vy]) => `radial-gradient(circle 300px at ${vx}px ${vy}px, rgba(255,255,255,0.14), transparent 70%)`
-  );
 
   return (
     <div
@@ -165,12 +163,17 @@ function GlareCard({
         }}
       />
       
-      {/* Glare effect powered by MotionValues */}
+      {/* Glare effect powered by MotionValues mapped to translation */}
       <motion.div
-        className="absolute inset-0 pointer-events-none mix-blend-overlay"
+        className="absolute top-0 left-0 pointer-events-none mix-blend-overlay"
         style={{
+          width: 600,
+          height: 600,
+          x: translateX,
+          y: translateY,
           opacity,
-          background: glareBackground,
+          background: 'radial-gradient(circle 300px at center, rgba(255,255,255,0.14), transparent 100%)',
+          willChange: 'transform, opacity'
         }}
       />
 
@@ -205,15 +208,16 @@ function ParallaxImage({ src, alt, className }: { src: string; alt: string; clas
 /* ─── Memoized Sub-components ───────────────────────────────── */
 const TechToolItem = React.memo(({ tool, index }: { tool: typeof TOOLKIT_ITEMS[0]; index: number }) => (
   <motion.div
-    initial={{ opacity: 0, scale: 0.85 }}
-    whileInView={{ opacity: 1, scale: 1 }}
+    initial={{ opacity: 0, scale: 0.85, y: 10 }}
+    whileInView={{ opacity: 1, scale: 1, y: 0 }}
     viewport={{ once: true }}
-    transition={{ duration: 0.45, delay: index * 0.05 }}
+    transition={{ type: "spring", damping: 25, stiffness: 300, delay: index * 0.04 }}
     className="group flex flex-col items-center gap-3 p-5 rounded-2xl cursor-default"
     style={{
       background: 'rgba(255,255,255,0.03)',
       border: '1px solid rgba(255,255,255,0.06)',
       transition: 'background 0.3s, border-color 0.3s, transform 0.3s',
+      willChange: 'transform, opacity'
     }}
     whileHover={{ scale: 1.08, y: -4 }}
   >
@@ -233,10 +237,11 @@ TechToolItem.displayName = 'TechToolItem';
 const DesignDNACard = React.memo(({ col, i, IconComponent }: { col: any; i: number; IconComponent: any }) => (
   <motion.div
     key={col.num || i}
-    initial={{ opacity: 0, y: 30 }}
-    whileInView={{ opacity: 1, y: 0 }}
+    initial={{ opacity: 0, y: 30, scale: 0.98 }}
+    whileInView={{ opacity: 1, y: 0, scale: 1 }}
     viewport={{ once: true, margin: '-60px' }}
-    transition={{ duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+    transition={{ type: "spring", damping: 28, stiffness: 200, delay: i * 0.1 }}
+    style={{ willChange: "transform, opacity" }}
   >
     <GlareCard gradient={col.gradient} accentColor={col.accent} className="h-full">
       <div className="p-8 flex flex-col h-full min-h-[220px]">
@@ -333,10 +338,11 @@ export default function AboutSection() {
 
         {/* ── Section Header ── */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={headerInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
+          animate={headerInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+          transition={{ type: "spring", damping: 30, stiffness: 220 }}
           className="mb-20"
+          style={{ willChange: "transform, opacity" }}
         >
           <div className="flex items-center gap-4 mb-6">
             <span className="text-primary font-mono text-xs tracking-[0.3em] uppercase">[ The Architect ]</span>
@@ -365,10 +371,11 @@ export default function AboutSection() {
 
           {/* Philosophy card */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ type: "spring", damping: 30, stiffness: 200 }}
+            style={{ willChange: "transform, opacity" }}
           >
             <GlareCard
               gradient="linear-gradient(135deg, #1e0b3e 0%, #0e0526 40%, #1a0840 100%)"
@@ -408,10 +415,11 @@ export default function AboutSection() {
 
           {/* Real portrait card */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ type: "spring", damping: 30, stiffness: 200, delay: 0.1 }}
+            style={{ willChange: "transform, opacity" }}
           >
             <GlareCard
               gradient="linear-gradient(135deg, #0f0522 0%, #080214 60%, #110728 100%)"
@@ -454,11 +462,12 @@ export default function AboutSection() {
 
         {/* ── Work Timeline ── */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ type: "spring", damping: 30, stiffness: 200 }}
           className="mb-6"
+          style={{ willChange: "transform, opacity" }}
         >
           <div className="flex items-center gap-4 mb-10">
             <span className="font-mono text-[10px] text-primary uppercase tracking-[0.3em]">// Career History</span>
@@ -472,7 +481,7 @@ export default function AboutSection() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
+                transition={{ type: "spring", damping: 25, stiffness: 250, delay: i * 0.08 }}
                 className="group relative flex flex-col md:flex-row md:items-baseline justify-between py-10 gap-4 md:gap-12"
                 style={{
                   borderTop: i === 0 ? '1px solid rgba(255,255,255,0.05)' : 'none',
@@ -498,11 +507,12 @@ export default function AboutSection() {
 
         {/* ── The Pulse (Metrics) — below timeline ── */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ type: "spring", damping: 30, stiffness: 200 }}
           className="mb-16"
+          style={{ willChange: "transform, opacity" }}
         >
           <GlareCard
             gradient="linear-gradient(135deg, #1e0b3e 0%, #0e0526 40%, #1a0840 100%)"
@@ -517,10 +527,10 @@ export default function AboutSection() {
                 {dynamicStats.map((stat, i) => (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.08 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 250, delay: i * 0.08 }}
                     className="flex flex-col gap-3"
                   >
                     <span className="font-mono text-[10px] text-white/25 uppercase tracking-widest">{stat.tag}</span>
@@ -535,11 +545,12 @@ export default function AboutSection() {
 
         {/* ── Identity Reel ── */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ type: "spring", damping: 30, stiffness: 200 }}
           className="mb-16"
+          style={{ willChange: "transform, opacity" }}
         >
           <div className="flex items-center gap-4 mb-6">
             <span className="font-mono text-[10px] text-white/25 uppercase tracking-[0.3em]">// Off The Clock</span>
@@ -615,11 +626,12 @@ export default function AboutSection() {
 
         {/* ── Technical Arsenal (bottom) — with colorful brand icons ── */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ type: "spring", damping: 30, stiffness: 200 }}
           className="mb-6"
+          style={{ willChange: "transform, opacity" }}
         >
           <div className="flex items-center gap-4 mb-10">
             <span className="font-mono text-[10px] text-white/25 uppercase tracking-[0.3em]">// Technical Arsenal</span>

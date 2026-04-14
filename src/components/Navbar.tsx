@@ -71,7 +71,7 @@ const Navbar = React.memo(function Navbar() {
       <motion.div
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ type: "spring", stiffness: 200, damping: 25, mass: 1 }}
         className="fixed top-6 left-0 right-0 z-[100] flex justify-center px-4 pointer-events-none"
       >
         <div 
@@ -141,10 +141,10 @@ const Navbar = React.memo(function Navbar() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            initial={{ opacity: 0, scale: 0.95, y: -15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -15 }}
+            transition={{ type: "spring", stiffness: 350, damping: 30 }}
             className="fixed inset-0 z-40 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center pointer-events-auto"
           >
             <div className="flex flex-col items-center gap-8">
@@ -154,7 +154,7 @@ const Navbar = React.memo(function Navbar() {
                   href={link.href}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
+                  transition={{ type: "spring", stiffness: 280, damping: 25, delay: i * 0.08 }}
                   onClick={(e) => handleNavClick(e, link.href)}
                   className="text-5xl font-display text-white hover:text-primary transition-colors duration-200 uppercase tracking-tight focus-visible:outline-none focus-visible:underline focus-visible:decoration-primary focus-visible:underline-offset-8"
                 >

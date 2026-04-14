@@ -46,14 +46,29 @@ function ScrollToTop() {
   return null;
 }
 
+const pageVariants = {
+  initial: { opacity: 0, y: 25, scale: 0.98 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -25, scale: 0.98 },
+};
+
+const pageTransition = {
+  type: "spring",
+  stiffness: 260,
+  damping: 30,
+  mass: 1,
+};
+
 const Home: React.FC = () => {
   return (
     <motion.main
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={pageTransition}
       className="relative z-10"
+      style={{ willChange: "transform, opacity" }}
     >
       <Hero />
       <Story />
@@ -66,11 +81,13 @@ const Home: React.FC = () => {
 const About: React.FC = () => {
   return (
     <motion.main
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={pageTransition}
       className="relative z-10 pt-20 pb-24"
+      style={{ willChange: "transform, opacity" }}
     >
       <AboutSection />
     </motion.main>
@@ -80,18 +97,20 @@ const About: React.FC = () => {
 const Work: React.FC = () => {
   return (
     <motion.main
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={pageTransition}
       className="relative z-10"
+      style={{ willChange: "transform, opacity" }}
     >
       {/* Page-level hero header */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 pt-36 pb-0 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 25 }}
           className="mb-0"
         >
           <div className="flex items-center gap-4 mb-6">
@@ -209,11 +228,11 @@ function StickyCTA() {
           <motion.a
             href="#contact"
             onClick={handleClick}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            transition={{ duration: 0.5 }}
-            className="fixed bottom-32 right-8 z-[60] px-8 py-3.5 bg-[#a78bfa] text-[#060010] font-black tracking-widest uppercase rounded-full shadow-[0_0_30px_rgba(167,139,250,0.5)] hover:bg-white hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.7)] transition-all hidden md:flex items-center gap-2"
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed bottom-32 right-8 z-[60] px-8 py-3.5 bg-[#a78bfa] text-[#060010] font-black tracking-widest uppercase rounded-full shadow-[0_0_30px_rgba(167,139,250,0.5)] hover:bg-white hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.7)] hidden md:flex items-center gap-2"
           >
             Hire Me <span className="text-xl leading-none">&rarr;</span>
           </motion.a>

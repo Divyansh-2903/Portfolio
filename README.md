@@ -1,20 +1,64 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+  <img src="public/preview.jpg" width="100%" alt="Portfolio Preview" />
+  
+  # SYNTAX STUDIO
+  ### Crafting Digital Experiences for Startups, Founders & Brands
+  
+  **Divyansh Saxena**  
+  *Fullstack Developer · UI/UX Designer · Motion Graphics*
+  
+  [Live Demo](https://divyanshsaxena.com) · [LinkedIn](https://linkedin.com/in/divyanshsaxena) · [GitHub](https://github.com/Divyansh-2903)
 </div>
 
-# Run and deploy your AI Studio app
+---
 
-This contains everything you need to run your app locally.
+## ⚡ The Ethos
+This isn't just a portfolio; it's a high-performance interactive storytelling engine. Built with a focus on **Andy's craft** and **Nikola's conversion depth**, it combines editorial-grade typography with 3D/motion layers to create a memorable brand identity.
 
-View your app in AI Studio: https://ai.studio/apps/987273f9-5874-4047-a782-9a25a85c85f3
+## 🛠️ The Arsenal
+The tech stack chosen for maximum performance and visual fidelity:
 
-## Run Locally
+- **Frontend:** React 19, TypeScript, Vite
+- **Animations:** Framer Motion, GSAP (ScrollTrigger)
+- **Visuals:** Three.js, Spline 3D, Tailwind CSS 4
+- **Content:** Sanity CMS (Headless)
+- **Experience:** Lenis Scroll, Lucide Icons, Custom Cursors
 
-**Prerequisites:**  Node.js
+## 🚀 Key Projects
+- **OneClip Hub:** A multi-platform media command center (Web, Tauri, Android).
+- **Flux IDE:** Cinematic landing page for developer tools.
+- **Syntax Website:** The dark, editorial anchor for the Syntax brand.
+- **Horizon HR:** AI-powered candidate funnel automation concept.
 
+## 📦 Services Provided
+- **Fullstack Development:** Building production-grade apps with React/Next.js.
+- **UI/UX Design:** Pixel-perfect interfaces designed in Figma/Framer.
+- **Motion Graphics:** High-end video editing and After Effects animation.
+- **Digital Strategy:** Growth-focused content and SEO strategy.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🛠️ Local Development
+
+1. **Clone the repo:**
+   ```bash
+   git clone https://github.com/Divyansh-2903/Portfolio.git
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment:**
+   Create a `.env.local` and add your Sanity/API keys (see `.env.example`).
+
+4. **Run Dev Server:**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+<div align="center">
+  <p>Built with precision in Jaipur, India 🇮🇳</p>
+  <p>© 2026 Syntax Studio</p>
+</div>

@@ -22,6 +22,7 @@ type Props = {
   falloffStart?: number;
   fogFallSpeed?: number;
   color?: string;
+  sentinelId?: string;
 };
 
 const VERT = `
@@ -68,7 +69,7 @@ uniform float uFade;
 #define EPS 1e-6
 #define EDGE_SOFT (DT_LOCAL*4.0)
 #define DT_LOCAL 0.0038
-#define TAP_RADIUS 6
+#define TAP_RADIUS 3
 #define R_H 150.0
 #define R_V 150.0
 #define FLARE_HEIGHT 16.0
@@ -98,7 +99,7 @@ uniform float uFade;
 #define FOG_CONTRAST 1.2
 #define FOG_SPEED_U 0.1
 #define FOG_SPEED_V -0.1
-#define FOG_OCTAVES 5
+#define FOG_OCTAVES 3
 #define FOG_BOTTOM_BIAS 0.8
 #define FOG_TILT_TO_MOUSE 0.05
 #define FOG_TILT_DEADZONE 0.01
@@ -220,7 +221,7 @@ void mainImage(out vec4 fc,in vec2 frag){
     fuv+=uFogTime*uFogFallSpeed*dir;
     vec2 prp=vec2(-dir.y,dir.x);
     fuv+=prp*(0.08*sin(dot(uvc,prp)*0.08+uFogTime*0.9));
-    float n=fbm2(fuv+vec2(fbm2(fuv+vec2(7.3,2.1)),fbm2(fuv+vec2(-3.7,5.9)))*0.6);
+    float n=fbm2(fuv+vnoise(fuv*2.0)*0.4);
     n=pow(clamp(n,0.0,1.0),FOG_CONTRAST);
     float pixW = 1.0 / max(iResolution.y, 1.0);
 #ifdef GL_OES_standard_derivatives
@@ -292,7 +293,8 @@ export const LaserFlow: React.FC<Props> = ({
   decay = 1.1,
   falloffStart = 1.2,
   fogFallSpeed = 0.6,
-  color = '#FF79C6'
+  color = '#FF79C6',
+  sentinelId
 }) => {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -437,7 +439,8 @@ export const LaserFlow: React.FC<Props> = ({
       },
       { threshold: 0.01 } // Pause even if just 1% is visible (aggressive)
     );
-    observer.observe(mount);
+    const targetElement = (sentinelId ? document.getElementById(sentinelId) : null) || mount;
+    observer.observe(targetElement);
 
     const updateMouse = (clientX: number, clientY: number) => {
       const rect = rectRef.current;
@@ -564,7 +567,7 @@ export const LaserFlow: React.FC<Props> = ({
       renderer.forceContextLoss();
       if (mount.contains(canvas)) mount.removeChild(canvas);
     };
-  }, [dpr]);
+  }, [dpr, sentinelId]);
 
   useEffect(() => {
     const uniforms = uniformsRef.current;

@@ -108,17 +108,6 @@ const Footer = React.memo(function Footer() {
           transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col items-center gap-5 mb-12"
         >
-          {/* Availability badge */}
-          <div
-            className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full"
-            style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)' }}
-          >
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
-            </span>
-            <span className="font-mono text-xs text-green-400/60 tracking-wide">Currently open to freelance — Updated {year}</span>
-          </div>
 
           {/* Contact links */}
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">

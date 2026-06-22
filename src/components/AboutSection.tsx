@@ -23,7 +23,7 @@ const DEFAULT_TIMELINE = [
     period: '2024 — Present',
     role: 'Founder',
     company: '@grindxgrowth',
-    desc: 'Built a digital brand focused on high-performance growth and "scroll-stopping" visual storytelling.\n\nMilestone: Successfully generated 140,000+ total views, validating a data-driven approach to content hooks and audience retention.',
+    desc: 'Built a digital brand focused on high-performance growth and "scroll-stopping" visual storytelling.\n\nMilestone: Successfully generated 150,000+ total views, validating a data-driven approach to content hooks and audience retention.',
   },
   {
     period: '2023 — 2025',

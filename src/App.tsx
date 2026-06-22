@@ -143,28 +143,30 @@ function AppContent() {
   return (
     <>
       <ScrollToTop />
-      
-      <div className="fixed inset-0 z-0 w-full h-full pointer-events-none">
-        <Suspense fallback={null}>
-          <LaserFlow
-            horizontalSizing={2.5}
-            verticalSizing={20}
-            wispDensity={1.5}
-            wispSpeed={20}
-            wispIntensity={5}
-            flowSpeed={0.5}
-            flowStrength={0.4}
-            fogIntensity={0.35}
-            fogScale={0.4}
-            fogFallSpeed={0.8}
-            decay={1}
-            falloffStart={2}
-            color="#A78BFA"
-            horizontalBeamOffset={0}
-            verticalBeamOffset={-0.3}
-          />
-        </Suspense>
-      </div>
+      {!loading && (
+        <div className="fixed inset-0 z-0 w-full h-full pointer-events-none">
+          <Suspense fallback={null}>
+            <LaserFlow
+              sentinelId="hero-section"
+              horizontalSizing={2.5}
+              verticalSizing={20}
+              wispDensity={1.5}
+              wispSpeed={20}
+              wispIntensity={5}
+              flowSpeed={0.5}
+              flowStrength={0.4}
+              fogIntensity={0.35}
+              fogScale={0.4}
+              fogFallSpeed={0.8}
+              decay={1}
+              falloffStart={2}
+              color="#A78BFA"
+              horizontalBeamOffset={0}
+              verticalBeamOffset={-0.3}
+            />
+          </Suspense>
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {loading && <LoadingScreen key="loading" onComplete={() => setLoading(false)} />}

@@ -8,7 +8,7 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void; 
     const timer = setTimeout(() => {
       setIsComplete(true);
       setTimeout(onComplete, 500); // Wait for exit animation
-    }, 1500);
+    }, 700);
 
     return () => clearTimeout(timer);
   }, [onComplete]);

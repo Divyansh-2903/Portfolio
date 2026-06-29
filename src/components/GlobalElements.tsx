@@ -20,6 +20,12 @@ export default function GlobalElements() {
   const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
+    const cursorEnabled = enableHeavyVisuals && enableHoverEffects;
+    document.body.classList.toggle('custom-cursor-enabled', cursorEnabled);
+    return () => document.body.classList.remove('custom-cursor-enabled');
+  }, [enableHeavyVisuals, enableHoverEffects]);
+
+  useEffect(() => {
     if (!enableHeavyVisuals || !enableHoverEffects) return;
 
     const updateMousePosition = (e: MouseEvent) => {
@@ -49,12 +55,14 @@ export default function GlobalElements() {
     <>
       {/* Scroll Progress Bar */}
       <motion.div
+        aria-hidden="true"
         className="fixed top-0 left-0 right-0 h-1 bg-primary origin-left z-[150]"
         style={{ scaleX }}
       />
 
       {/* Custom Cursor */}
       {enableHeavyVisuals && enableHoverEffects && <motion.div
+        aria-hidden="true"
         className="fixed top-0 left-0 w-4 h-4 rounded-full bg-primary pointer-events-none z-[200] mix-blend-screen"
         style={{
           x: cursorX,

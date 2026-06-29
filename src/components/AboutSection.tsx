@@ -39,6 +39,10 @@ const PhotoshopIcon = ({ className, size = 24 }: { className?: string; size?: nu
   <img 
     src="/assets/photoshop.svg" 
     alt="Photoshop" 
+    width={Number(size) || 24}
+    height={Number(size) || 24}
+    loading="lazy"
+    decoding="async"
     className={`${className} object-contain block`} 
     style={{ width: size, height: size }} 
   />
@@ -48,6 +52,10 @@ const PremiereIcon = ({ className, size = 24 }: { className?: string; size?: num
   <img 
     src="/assets/premiere.svg" 
     alt="Premiere Pro" 
+    width={Number(size) || 24}
+    height={Number(size) || 24}
+    loading="lazy"
+    decoding="async"
     className={`${className} object-contain block`} 
     style={{ width: size, height: size }} 
   />
@@ -57,6 +65,10 @@ const AfterEffectsIcon = ({ className, size = 24 }: { className?: string; size?:
   <img 
     src="/assets/aftereffects.svg" 
     alt="After Effects" 
+    width={Number(size) || 24}
+    height={Number(size) || 24}
+    loading="lazy"
+    decoding="async"
     className={`${className} object-contain block`} 
     style={{ width: size, height: size }} 
   />
@@ -66,6 +78,10 @@ const ClaudeIcon = ({ className, size = 24 }: { className?: string; size?: numbe
   <img 
     src="/assets/claude.svg" 
     alt="Claude" 
+    width={Number(size) || 24}
+    height={Number(size) || 24}
+    loading="lazy"
+    decoding="async"
     className={`${className} object-contain block`} 
     style={{ width: size, height: size }} 
   />
@@ -75,6 +91,10 @@ const AntigravityIcon = ({ className, size = 24 }: { className?: string; size?: 
   <img 
     src="/assets/antigravity.svg" 
     alt="Antigravity" 
+    width={Number(size) || 24}
+    height={Number(size) || 24}
+    loading="lazy"
+    decoding="async"
     className={`${className} object-contain block`} 
     style={{ width: size, height: size }} 
   />
@@ -153,7 +173,7 @@ function GlareCard({
       className={`relative rounded-3xl overflow-hidden ${className}`}
       style={{
         background: gradient,
-        transition: 'all 0.4s ease',
+        transition: 'background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease',
       }}
     >
       <div
@@ -199,6 +219,10 @@ function ParallaxImage({ src, alt, className }: { src: string; alt: string; clas
         style={{ y, scale: 1.15 }}
         src={src}
         alt={alt}
+        width={1200}
+        height={800}
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 w-full h-full object-cover grayscale opacity-60 hover:grayscale-0 hover:opacity-90 transition-all duration-700"
       />
     </div>
@@ -430,6 +454,10 @@ export default function AboutSection() {
                 <img
                   src={aboutData.portraitImage ? urlFor(aboutData.portraitImage).width(800).url() : "/assets/divyansh.jpg"}
                   alt={aboutData.name}
+                  width={800}
+                  height={1000}
+                  loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 w-full h-full object-cover"
                   style={{ objectPosition: 'center 10%' }}
                 />

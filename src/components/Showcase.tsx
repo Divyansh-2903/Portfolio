@@ -11,7 +11,7 @@ import { Category, Project, projects } from '../data/projects';
 
 /* ─── Category Icon ──────────────────────────────────── */
 const CategoryIcon = React.memo(({ cat }: { cat: Category }) =>
-  cat === 'fullstack' ? <Code2 size={14} /> : <Film size={14} />);
+  cat === 'fullstack' ? <Code2 size={14} aria-hidden="true" /> : <Film size={14} aria-hidden="true" />);
 CategoryIcon.displayName = 'CategoryIcon';
 
 /* ─── Metric Chip ────────────────────────────────────── */
@@ -59,7 +59,7 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
       onMouseEnter={() => { if (enableHoverEffects) { glareOpacity.set(1); setHovered(true); } }}
       onMouseLeave={() => { glareOpacity.set(0); setHovered(false); }}
       onMouseMove={handleMouseMove}
-      className="group relative rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer"
+      className="group relative rounded-2xl md:rounded-3xl overflow-hidden"
       style={{
         background: project.gradient,
         boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
@@ -125,7 +125,8 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
             to={`/work/${project.id}`}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="shrink-0 flex items-center justify-center w-11 h-11 rounded-full"
+            aria-label={`Open ${project.title} case study`}
+            className="shrink-0 flex items-center justify-center w-11 h-11 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             style={{
               background: hovered ? project.accentColor : 'rgba(255,255,255,0.06)',
               border: `1px solid ${hovered ? project.accentColor : 'rgba(255,255,255,0.1)'}`,
@@ -133,7 +134,7 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
               transition: 'all 0.3s ease',
             }}
           >
-            <ArrowUpRight size={18} />
+            <ArrowUpRight size={18} aria-hidden="true" />
           </MotionLink>
         </div>
 
@@ -168,10 +169,10 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
           <MotionLink
             to={`/work/${project.id}`}
             whileHover={{ x: 4 }}
-            className="shrink-0 flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest"
+            className="shrink-0 flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-full"
             style={{ color: project.accentColor }}
           >
-            Case Study <ArrowUpRight size={12} />
+            Case Study <ArrowUpRight size={12} aria-hidden="true" />
           </MotionLink>
         </div>
       </div>
@@ -214,7 +215,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
       onMouseEnter={() => { if (enableHoverEffects) { glareOpacity.set(1); setHovered(true); } }}
       onMouseLeave={() => { glareOpacity.set(0); setHovered(false); }}
       onMouseMove={handleMouseMove}
-      className="relative col-span-full rounded-3xl overflow-hidden cursor-pointer"
+      className="relative col-span-full rounded-2xl md:rounded-3xl overflow-hidden"
       style={{
         background: project.gradient,
         minHeight: '420px',
@@ -229,7 +230,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
         className="absolute top-6 left-6 flex items-center gap-2 px-3 py-1.5 rounded-full"
         style={{ background: `${project.accentColor}18`, border: `1px solid ${project.accentColor}35` }}
       >
-        <Layers size={11} style={{ color: project.accentColor }} />
+        <Layers size={11} aria-hidden="true" style={{ color: project.accentColor }} />
         <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: project.accentColor }}>
           Featured
         </span>
@@ -318,18 +319,20 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
               to={`/work/${project.id}`}
               whileHover={{ scale: 1.04, y: -2 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-3 px-7 py-4 rounded-full font-bold text-sm uppercase tracking-widest"
+              className="flex items-center gap-3 px-7 py-4 rounded-full font-bold text-sm uppercase tracking-widest focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               style={{
                 background: project.accentColor,
                 color: '#080808',
                 boxShadow: `0 0 40px ${project.accentColor}40`,
               }}
             >
-              View Case Study <ArrowUpRight size={16} />
+              View Case Study <ArrowUpRight size={16} aria-hidden="true" />
             </MotionLink>
 
             {project.category === 'video' && (
               <motion.button
+                type="button"
+                aria-label={`Play ${project.title} preview`}
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center justify-center w-14 h-14 rounded-full"
@@ -338,7 +341,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
                   border: '1px solid rgba(255,255,255,0.12)',
                 }}
               >
-                <Play size={20} className="text-white ml-0.5" />
+                <Play size={20} aria-hidden="true" className="text-white ml-0.5" />
               </motion.button>
             )}
           </div>
@@ -420,7 +423,7 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
           </div>
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <h2 className="font-display text-[clamp(3rem,8vw,7rem)] uppercase tracking-[0.02em] text-white leading-[0.9]">
+            <h2 className="balanced-heading font-display text-[clamp(3rem,8vw,7rem)] uppercase tracking-[0.02em] text-white leading-[0.9]">
               THE{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-300 to-indigo-300">
                 WORK
@@ -429,14 +432,19 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
 
             {/* Tab switcher */}
             <div
+              role="tablist"
+              aria-label="Project category"
               className="flex items-center gap-1 p-1 rounded-full"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               {tabs.map((tab) => (
                 <motion.button
                   key={tab.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={active === tab.key}
                   onClick={() => setActive(tab.key)}
-                  className="relative flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-mono uppercase tracking-widest transition-colors duration-300"
+                  className="relative flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-mono uppercase tracking-widest transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                   style={{
                     color: active === tab.key ? '#080808' : 'rgba(255,255,255,0.45)',
                   }}
@@ -450,7 +458,7 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
                     />
                   )}
                   <span className="relative z-10 flex items-center gap-2">
-                    {tab.icon}
+                    <span aria-hidden="true">{tab.icon}</span>
                     {tab.label}
                   </span>
                 </motion.button>
@@ -462,16 +470,21 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
 
         {/* Tab switcher shown separately when header is hidden */}
         {hideHeader && (
-          <div className="flex items-center justify-between mb-10">
+          <div className="flex items-center justify-between mb-10 overflow-x-auto pb-1">
             <div
+              role="tablist"
+              aria-label="Project category"
               className="flex items-center gap-1 p-1 rounded-full"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               {tabs.map((tab) => (
                 <motion.button
                   key={tab.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={active === tab.key}
                   onClick={() => setActive(tab.key)}
-                  className="relative flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-mono uppercase tracking-widest transition-colors duration-300"
+                  className="relative flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-mono uppercase tracking-widest transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                   style={{ color: active === tab.key ? '#080808' : 'rgba(255,255,255,0.45)' }}
                 >
                   {active === tab.key && (
@@ -483,7 +496,7 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
                     />
                   )}
                   <span className="relative z-10 flex items-center gap-2">
-                    {tab.icon}
+                    <span aria-hidden="true">{tab.icon}</span>
                     {tab.label}
                   </span>
                 </motion.button>
@@ -510,6 +523,11 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
             {rest.map((project, i) => (
               <ProjectCard key={project.id} project={project} index={i} />
             ))}
+            {!featured && rest.length === 0 && (
+              <div className="col-span-full rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center text-white/50">
+                No projects available in this category yet.
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
 
@@ -526,14 +544,14 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
             href="#contact"
             whileHover={{ scale: 1.04, y: -2 }}
             whileTap={{ scale: 0.97 }}
-            className="inline-flex items-center gap-3 px-10 py-5 rounded-full font-bold text-white border uppercase font-mono text-sm tracking-widest"
+            className="inline-flex items-center gap-3 px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-white border uppercase font-mono text-xs sm:text-sm tracking-widest focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             style={{
               border: '1px solid rgba(255,255,255,0.12)',
               background: 'rgba(255,255,255,0.03)',
               backdropFilter: 'blur(10px)',
             }}
           >
-            Start a Project Together <ArrowUpRight size={18} />
+            Start a Project Together <ArrowUpRight size={18} aria-hidden="true" />
           </motion.a>
         </motion.div>
       </div>

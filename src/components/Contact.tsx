@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useInView, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion';
 import { Mail, Linkedin, Github, MessageCircle, ArrowUpRight, Zap, Check, Copy } from 'lucide-react';
+import { usePerformanceProfile } from '../lib/performance';
 
 /* ─── Custom Icons ────────────────────────────────────────── */
 const WhatsappIcon = ({ size = 24, ...props }: any) => (
@@ -51,6 +52,7 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLAnchorElement>(null);
   const isEmail = s.label === 'Email';
+  const { enableHoverEffects } = usePerformanceProfile();
 
   // Performance tracking
   const x = useMotionValue(0);
@@ -62,7 +64,7 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
   const glareBackground = useMotionTemplate`radial-gradient(400px circle at ${springX}px ${springY}px, ${s.accentColor}30, transparent 80%)`;
 
   const handleMove = (e: React.MouseEvent) => {
-    if (!ref.current) return;
+    if (!ref.current || !enableHoverEffects) return;
     const r = ref.current.getBoundingClientRect();
     x.set(e.clientX - r.left);
     y.set(e.clientY - r.top);
@@ -80,7 +82,7 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
   return (
     <motion.a
       ref={ref}
-      href={isEmail ? undefined : s.href}
+      href={s.href}
       target={s.href.startsWith('http') ? '_blank' : undefined}
       rel="noopener noreferrer"
       onClick={handleClick}
@@ -89,6 +91,7 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
       viewport={{ once: true }}
       transition={{ delay: 0.06 * index, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
       onMouseEnter={() => {
+        if (!enableHoverEffects) return;
         setHovered(true);
         opacity.set(1);
       }}
@@ -97,11 +100,11 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
         opacity.set(0);
       }}
       onMouseMove={handleMove}
-      className="relative group flex items-center gap-4 p-5 rounded-2xl cursor-pointer overflow-hidden"
+      className="relative group flex items-center gap-4 p-5 rounded-2xl cursor-pointer overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-black"
       style={{
         background: s.gradient,
         boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-        transition: 'all 0.4s ease',
+        transition: 'border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease',
         border: '1px solid rgba(255,255,255,0.06)',
       }}
     >
@@ -113,13 +116,13 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
         }}
       />
       {/* Glare effect powered by MotionValues */}
-      <motion.div
+      {enableHoverEffects && <motion.div
         className="absolute inset-0 pointer-events-none mix-blend-overlay"
         style={{
           opacity,
           background: glareBackground,
         }}
-      />
+      />}
       {/* Ambient top-right glow */}
       <div
         className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none transition-opacity duration-500"
@@ -157,6 +160,7 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
         <p
           className="text-sm font-semibold leading-none mb-1 transition-colors duration-300"
           style={{ color: (isEmail && copied) ? '#22c55e' : (hovered ? s.accentColor : 'rgba(255,255,255,0.85)') }}
+          aria-live={isEmail ? 'polite' : undefined}
         >
           {isEmail && copied ? 'Copied!' : s.label}
         </p>
@@ -188,111 +192,50 @@ function SocialCard({ s, index }: { s: typeof socials[0]; index: number; key?: s
 
 /* ─── Glow Input ─────────────────────────────────────────── */
 function GlowInput({
-  id, label, type = 'text', placeholder, as = 'input', rows, options,
+  id, label, type = 'text', placeholder, as = 'input', rows, options, name, autoComplete, required, error,
   inputRef, selectRef, textareaRef,
 }: {
   id: string; label: string; type?: string; placeholder?: string;
   as?: 'input' | 'textarea' | 'select'; rows?: number;
   options?: { value: string; label: string }[];
+  name?: string; autoComplete?: string; required?: boolean; error?: string;
   inputRef?: React.RefObject<HTMLInputElement>;
   selectRef?: React.RefObject<HTMLSelectElement>;
   textareaRef?: React.RefObject<HTMLTextAreaElement>;
 }) {
   const [focused, setFocused] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("");
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (as !== 'select') return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-        setFocused(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [as]);
-
-  const sharedClass = `w-full bg-[rgba(255,255,255,0.03)] rounded-xl px-4 py-3 text-white text-sm font-body placeholder-white/20 outline-none appearance-none transition-all duration-300 resize-none`;
+  const sharedClass = `w-full bg-[rgba(255,255,255,0.03)] rounded-xl px-4 py-3 text-white text-sm font-body placeholder-white/20 outline-none appearance-none transition-[border-color,box-shadow,background-color] duration-300 resize-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#14072d]`;
   const sharedStyle: React.CSSProperties = {
-    border: `1px solid ${focused || isOpen ? 'oklch(0.75 0.18 280 / 0.5)' : 'rgba(255,255,255,0.07)'}`,
-    boxShadow: focused || isOpen ? '0 0 0 3px oklch(0.75 0.18 280 / 0.08), 0 0 20px oklch(0.75 0.18 280 / 0.1)' : 'none',
-    background: focused || isOpen ? 'rgba(167,139,250,0.04)' : 'rgba(255,255,255,0.03)',
+    border: `1px solid ${error ? '#fb7185' : focused ? 'oklch(0.75 0.18 280 / 0.5)' : 'rgba(255,255,255,0.07)'}`,
+    boxShadow: error ? '0 0 0 3px rgba(251,113,133,0.1)' : focused ? '0 0 0 3px oklch(0.75 0.18 280 / 0.08), 0 0 20px oklch(0.75 0.18 280 / 0.1)' : 'none',
+    background: focused ? 'rgba(167,139,250,0.04)' : 'rgba(255,255,255,0.03)',
+    colorScheme: 'dark',
   };
+  const describedBy = error ? `${id}-error` : undefined;
 
   return (
-    <div className={`space-y-2 ${as === 'select' ? 'relative' : ''}`} ref={containerRef}>
+    <div className="space-y-2">
       <label htmlFor={id} className="block text-[11px] font-mono uppercase tracking-[0.2em] text-white/35">
         {label}
       </label>
       {as === 'textarea' ? (
-        <textarea ref={textareaRef} id={id} rows={rows || 4} placeholder={placeholder} className={`${sharedClass} leading-relaxed`}
+        <textarea ref={textareaRef} id={id} name={name || id} rows={rows || 4} placeholder={placeholder} required={required} aria-invalid={Boolean(error)} aria-describedby={describedBy} className={`${sharedClass} leading-relaxed`}
           style={sharedStyle} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} />
       ) : as === 'select' ? (
-        <>
-          {/* Hidden select to preserve form refs & native behaviour */}
-          <select ref={selectRef} id={id} value={selectedValue} onChange={(e) => setSelectedValue(e.target.value)} className="hidden">
-            <option value="">Select…</option>
-            {options?.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-
-          {/* Custom Select Trigger */}
-          <div
-            onClick={() => { setIsOpen(!isOpen); setFocused(!isOpen); }}
-            className={`${sharedClass} cursor-pointer flex items-center justify-between select-none`}
-            style={{ ...sharedStyle, color: selectedValue ? 'white' : 'rgba(255,255,255,0.3)' }}
-          >
-            <span>{selectedValue ? options?.find(o => o.value === selectedValue)?.label : 'Select…'}</span>
-            <motion.svg animate={{ rotate: isOpen ? 180 : 0 }} className="w-3 h-3 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </motion.svg>
-          </div>
-
-          {/* Custom Select Dropdown Options */}
-          <AnimatePresence>
-            {isOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="absolute top-full left-0 right-0 mt-2 z-50 rounded-xl overflow-hidden backdrop-blur-xl"
-                style={{
-                  background: 'rgba(10, 5, 20, 0.95)',
-                  border: '1px solid rgba(167,139,250,0.2)',
-                  boxShadow: '0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(167,139,250,0.1)',
-                }}
-              >
-                <div className="max-h-60 overflow-y-auto py-1">
-                  <div
-                    onClick={() => { setSelectedValue(''); setIsOpen(false); setFocused(false); }}
-                    className="px-4 py-3 text-sm text-white/40 hover:bg-white/5 hover:text-white cursor-pointer transition-colors"
-                  >
-                    Select…
-                  </div>
-                  {options?.map((o) => (
-                    <div
-                      key={o.value}
-                      onClick={() => { setSelectedValue(o.value); setIsOpen(false); setFocused(false); }}
-                      className={`px-4 py-3 text-sm cursor-pointer transition-colors ${
-                        selectedValue === o.value
-                          ? 'bg-primary/20 text-primary'
-                          : 'text-white/80 hover:bg-white/5 hover:text-white'
-                      }`}
-                    >
-                      {o.label}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </>
+        <select ref={selectRef} id={id} name={name || id} defaultValue="" aria-invalid={Boolean(error)} aria-describedby={describedBy} className={`${sharedClass} cursor-pointer pr-10`}
+          style={sharedStyle} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}>
+          <option value="">Select…</option>
+          {options?.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
       ) : (
-        <input ref={inputRef} id={id} type={type} placeholder={placeholder} className={sharedClass}
+        <input ref={inputRef} id={id} name={name || id} type={type} placeholder={placeholder} autoComplete={autoComplete || 'off'} required={required} inputMode={type === 'tel' ? 'tel' : type === 'email' ? 'email' : undefined} spellCheck={type === 'email' ? false : undefined} aria-invalid={Boolean(error)} aria-describedby={describedBy} className={sharedClass}
           style={sharedStyle} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} />
+      )}
+      {error && (
+        <p id={`${id}-error`} className="text-xs text-rose-300" aria-live="polite">
+          {error}
+        </p>
       )}
     </div>
   );
@@ -305,6 +248,8 @@ export default function Contact() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [showOptional, setShowOptional] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { enableHeavyVisuals, enableHoverEffects } = usePerformanceProfile();
 
   // Refs to read form values
   const nameRef = useRef<HTMLInputElement>(null);
@@ -324,8 +269,16 @@ export default function Contact() {
     const type    = typeRef.current?.value    || '';
     const message = messageRef.current?.value || '';
 
-    if (!name || !email || !message) {
-      alert('Please fill out all required fields.');
+    const nextErrors: Record<string, string> = {};
+    if (!name.trim()) nextErrors.name = 'Enter your name.';
+    if (!email.trim()) nextErrors.email = 'Enter an email address.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) nextErrors.email = 'Use a valid email address.';
+    if (!message.trim()) nextErrors.message = 'Share a few details about the project.';
+
+    setErrors(nextErrors);
+    const firstError = Object.keys(nextErrors)[0];
+    if (firstError) {
+      document.getElementById(firstError)?.focus();
       return;
     }
 
@@ -356,7 +309,10 @@ export default function Contact() {
         if (emailRef.current) emailRef.current.value = '';
         if (phoneRef.current) phoneRef.current.value = '';
         if (socialRef.current) socialRef.current.value = '';
+        if (budgetRef.current) budgetRef.current.value = '';
+        if (typeRef.current) typeRef.current.value = '';
         if (messageRef.current) messageRef.current.value = '';
+        setErrors({});
         setShowOptional(false);
         setTimeout(() => setSent(false), 5000);
       } else {
@@ -374,7 +330,7 @@ export default function Contact() {
     <section id="contact" ref={sectionRef} className="relative py-32 bg-bg overflow-hidden">
 
       {/* ── Showcase-style multi-colour gradient orbs ── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {enableHeavyVisuals && <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Bright lavender — top-left (hero color) */}
         <div className="absolute -top-32 -left-32 w-[700px] h-[700px] rounded-full"
           style={{ background: 'radial-gradient(circle, #c4b5fd22 0%, transparent 60%)', filter: 'blur(80px)' }} />
@@ -390,7 +346,7 @@ export default function Contact() {
         {/* Green — bottom-left */}
         <div className="absolute bottom-0 -left-20 w-[400px] h-[400px] rounded-full"
           style={{ background: 'radial-gradient(circle, #34d39910 0%, transparent 60%)', filter: 'blur(70px)' }} />
-      </div>
+      </div>}
 
       {/* ── Tinted grid ── */}
       <div
@@ -417,7 +373,7 @@ export default function Contact() {
           </div>
 
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-            <h2 className="font-display text-[clamp(3.5rem,10vw,9rem)] uppercase tracking-[0.02em] leading-[0.85] text-white">
+            <h2 className="balanced-heading font-display text-[clamp(3.5rem,10vw,9rem)] uppercase tracking-[0.02em] leading-[0.85] text-white">
               LET'S{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-300 to-indigo-300">
                 TALK
@@ -467,8 +423,8 @@ export default function Contact() {
 
             <form className="space-y-6 relative z-10" onSubmit={(e) => e.preventDefault()}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <GlowInput id="name" label="Full Name" placeholder="Divyansh Saxena" inputRef={nameRef} />
-                <GlowInput id="email" type="email" label="Email Address" placeholder="you@example.com" inputRef={emailRef} />
+                <GlowInput id="name" label="Full Name" placeholder="Divyansh Saxena…" autoComplete="name" required error={errors.name} inputRef={nameRef} />
+                <GlowInput id="email" type="email" label="Email Address" placeholder="you@example.com…" autoComplete="email" required error={errors.email} inputRef={emailRef} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <GlowInput id="budget" label="Budget Range" as="select" selectRef={budgetRef} options={[
@@ -526,22 +482,22 @@ export default function Contact() {
                     className="overflow-hidden"
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pb-2">
-                      <GlowInput id="phone" label="Phone / WhatsApp" placeholder="e.g. +91 00000 00000" type="tel" inputRef={phoneRef} />
-                      <GlowInput id="social" label="Social Media" placeholder="e.g. instagram.com/yourname" inputRef={socialRef} />
+                      <GlowInput id="phone" label="Phone / WhatsApp" placeholder="e.g. +91 00000 00000…" type="tel" autoComplete="tel" inputRef={phoneRef} />
+                      <GlowInput id="social" label="Social Media" placeholder="e.g. instagram.com/yourname…" type="url" inputRef={socialRef} />
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <GlowInput id="message" label="Message" as="textarea" rows={5} placeholder="Tell me what you're building…" textareaRef={messageRef} />
+              <GlowInput id="message" label="Message" as="textarea" rows={5} placeholder="Tell me what you're building…" required error={errors.message} textareaRef={messageRef} />
 
               <motion.button
                 type="button"
                 onClick={handleSend}
                 disabled={sending || sent}
-                whileHover={{ scale: 1.01 }}
+                whileHover={enableHoverEffects ? { scale: 1.01 } : undefined}
                 whileTap={{ scale: 0.98 }}
-                className="relative w-full py-4 rounded-xl font-bold text-sm tracking-widest uppercase overflow-hidden transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="relative w-full py-4 rounded-xl font-bold text-sm tracking-widest uppercase overflow-hidden transition-[opacity,transform,box-shadow] duration-300 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#14072d]"
                 style={{
                   background: sent
                     ? 'linear-gradient(135deg, #22C55E20, #22C55E10)'

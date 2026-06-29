@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, type MouseEvent } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -48,7 +48,7 @@ export default function Hero() {
   const scrollOp = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
   const scrollY = useTransform(scrollYProgress, [0, 0.55], [0, simplifyMotion ? -12 : -40]);
 
-  const handleTalkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleTalkClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     if (lenis) {
       lenis.scrollTo('#contact', { offset: -80 });
@@ -125,7 +125,7 @@ export default function Hero() {
           <div className="w-full flex justify-center items-center mb-6">
             <motion.h1
               variants={titleReveal}
-              className="font-display text-[clamp(3.4rem,12vw,9rem)] leading-none tracking-tighter uppercase grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-8 md:gap-16 lg:gap-20 z-10 sm:mix-blend-screen w-full"
+              className="balanced-heading font-display text-[clamp(3.4rem,12vw,9rem)] leading-none tracking-tight uppercase grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-8 md:gap-16 lg:gap-20 z-10 sm:mix-blend-screen w-full"
             >
               <span className="text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] text-center sm:text-right">DIVYANSH</span>
               <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-300 to-indigo-300 drop-shadow-glow-md text-center sm:text-left">SAXENA</span>
@@ -151,7 +151,7 @@ export default function Hero() {
               className="group relative inline-flex items-center justify-center px-7 sm:px-10 py-4 sm:py-5 font-bold text-white border border-white/20 bg-[#080808]/70 sm:backdrop-blur-lg rounded-full hover:bg-white/10 transition-all hover:-translate-y-1 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none hover:border-primary/50 text-base sm:text-xl"
             >
               <span className="flex items-center gap-3">
-                Let's Talk <Mail size={22} />
+                Let's Talk <Mail size={22} aria-hidden="true" />
               </span>
             </a>
 
@@ -161,7 +161,7 @@ export default function Hero() {
             >
               <span className="absolute inset-0 w-full h-full rounded-full opacity-60 bg-gradient-to-b from-white/40 to-transparent mix-blend-overlay" />
               <span className="relative flex items-center gap-3">
-                See My Work <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
+                See My Work <ArrowRight size={22} aria-hidden="true" className="group-hover:translate-x-1 transition-transform" />
               </span>
             </Link>
           </motion.div>

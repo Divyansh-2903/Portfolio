@@ -60,6 +60,7 @@ const pageTransition = {
 const Home: React.FC = () => {
   return (
     <motion.main
+      id="main-content"
       initial="initial"
       animate="animate"
       exit="exit"
@@ -79,6 +80,7 @@ const Home: React.FC = () => {
 const About: React.FC = () => {
   return (
     <motion.main
+      id="main-content"
       initial="initial"
       animate="animate"
       exit="exit"
@@ -95,6 +97,7 @@ const About: React.FC = () => {
 const Work: React.FC = () => {
   return (
     <motion.main
+      id="main-content"
       initial="initial"
       animate="animate"
       exit="exit"
@@ -116,7 +119,7 @@ const Work: React.FC = () => {
             <div className="h-px bg-white/10 flex-1" />
           </div>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-            <h1 className="font-display text-[clamp(3.5rem,10vw,9rem)] uppercase tracking-[0.02em] leading-[0.85] text-white">
+            <h1 className="balanced-heading font-display text-[clamp(3.5rem,10vw,9rem)] uppercase tracking-[0.02em] leading-[0.85] text-white">
               THE{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-300 to-indigo-300">
                 WORK
@@ -149,6 +152,7 @@ function AppContent() {
 
       {!loading && (
         <>
+          <a href="#main-content" className="skip-link">Skip To Content</a>
           <GlobalElements />
           <Navbar />
           
@@ -232,7 +236,7 @@ function StickyCTA() {
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed bottom-32 right-8 z-[60] px-8 py-3.5 bg-[#a78bfa] text-[#060010] font-black tracking-widest uppercase rounded-full shadow-[0_0_30px_rgba(167,139,250,0.5)] hover:bg-white hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.7)] hidden md:flex items-center gap-2"
           >
-            Hire Me <span className="text-xl leading-none">&rarr;</span>
+            Hire Me <span className="text-xl leading-none" aria-hidden="true">&rarr;</span>
           </motion.a>
       )}
     </AnimatePresence>

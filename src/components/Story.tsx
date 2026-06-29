@@ -7,6 +7,7 @@ import {
   type MotionValue,
   type MotionStyle,
 } from 'framer-motion';
+import { usePerformanceProfile } from '../lib/performance';
 
 /* ─── Config ───────────────────────────────────────────────── */
 const STEP_VH = 200;
@@ -352,60 +353,106 @@ function ScrollHint({ progress }: { progress: MotionValue<number> }) {
   );
 }
 
-/* ─── Export ────────────────────────────────────────────────── */
-export default function Story() {
+function StoryHeader() {
+  return (
+    <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 pt-24 pb-16">
+      <div className="flex items-center gap-4 mb-4">
+        <span className="text-primary font-mono text-xs tracking-[0.3em] uppercase">
+          [ The Process ]
+        </span>
+        <div className="h-px bg-white/10 flex-1" />
+      </div>
+      <h2 className="balanced-heading font-display text-[clamp(3rem,8vw,7rem)] uppercase tracking-[0.02em] text-white leading-[0.9]">
+        HOW I{' '}
+        <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-300 to-indigo-300">
+          WORK
+        </span>
+      </h2>
+    </div>
+  );
+}
+
+function StaticStory() {
+  return (
+    <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 pb-24">
+      <div className="grid gap-4">
+        {steps.map((step) => (
+          <article
+            key={step.num}
+            className="rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+            style={{ boxShadow: `inset 0 1px 0 ${step.accentColor}22` }}
+          >
+            <div className="mb-4 flex items-center gap-3">
+              <span className="font-mono text-[11px] uppercase tracking-[0.28em]" style={{ color: step.accentColor }}>
+                {step.num}
+              </span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-white/30">
+                {step.tag}
+              </span>
+            </div>
+            <p className="balanced-heading font-display text-3xl uppercase leading-tight tracking-[0.03em] text-white">
+              {step.segments.map((segment, i) => (
+                <span
+                  key={i}
+                  style={{
+                    color: segment.accent ? step.accentColor : undefined,
+                    fontStyle: segment.italic ? 'italic' : undefined,
+                  }}
+                >
+                  {segment.text}
+                </span>
+              ))}
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ScrollStory() {
   const container = useRef<HTMLDivElement>(null);
   const totalVh = steps.length * STEP_VH + TAIL_VH;
-
   const { scrollYProgress } = useScroll({
     target: container,
     offset: ['start start', 'end end'],
   });
-
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 60, damping: 20 });
 
   return (
+    <div ref={container} className="relative" style={{ height: `${totalVh}vh` }}>
+      <div className="sticky top-0 h-screen overflow-hidden">
+        <GhostNumber progress={smoothProgress} totalVh={totalVh} />
+
+        {steps.map((step, i) => (
+          <Panel
+            key={i}
+            step={step}
+            smoothProgress={smoothProgress}
+            rawProgress={scrollYProgress}
+            index={i}
+            total={steps.length}
+            totalVh={totalVh}
+          />
+        ))}
+
+        <ProgressDots total={steps.length} progress={smoothProgress} totalVh={totalVh} />
+        <ProgressBar progress={smoothProgress} />
+        <ScrollHint progress={smoothProgress} />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Export ────────────────────────────────────────────────── */
+export default function Story() {
+  const { reducedMotion, smallScreen, lowPowerHardware } = usePerformanceProfile();
+  const useStaticStory = reducedMotion || smallScreen || lowPowerHardware;
+
+  return (
     <section id="process" className="relative bg-bg">
-
-      {/* Section header */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 pt-24 pb-16">
-        <div className="flex items-center gap-4 mb-4">
-          <span className="text-primary font-mono text-xs tracking-[0.3em] uppercase">
-            [ The Process ]
-          </span>
-          <div className="h-px bg-white/10 flex-1" />
-        </div>
-        <h2 className="font-display text-[clamp(3rem,8vw,7rem)] uppercase tracking-[0.02em] text-white leading-[0.9]">
-          HOW I{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-purple-300 to-indigo-300">
-            WORK
-          </span>
-        </h2>
-      </div>
-
-      {/* Scroll track */}
-      <div ref={container} className="relative" style={{ height: `${totalVh}vh` }}>
-        <div className="sticky top-0 h-screen overflow-hidden">
-
-          <GhostNumber progress={smoothProgress} totalVh={totalVh} />
-
-          {steps.map((step, i) => (
-            <Panel
-              key={i}
-              step={step}
-              smoothProgress={smoothProgress}
-              rawProgress={scrollYProgress}
-              index={i}
-              total={steps.length}
-              totalVh={totalVh}
-            />
-          ))}
-
-          <ProgressDots total={steps.length} progress={smoothProgress} totalVh={totalVh} />
-          <ProgressBar progress={smoothProgress} />
-          <ScrollHint progress={smoothProgress} />
-        </div>
-      </div>
+      <StoryHeader />
+      {useStaticStory ? <StaticStory /> : <ScrollStory />}
     </section>
   );
 }

@@ -35,6 +35,19 @@ const Navbar = React.memo(function Navbar() {
     setActivePath(location.pathname + location.hash || '/');
   }, [location]);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileMenuOpen(false);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   const navLinks = [
     { name: 'Home',    href: '/'        },
     { name: 'Work',    href: '/work'    },
@@ -129,10 +142,14 @@ const Navbar = React.memo(function Navbar() {
 
 
             <button
-              className="md:hidden text-white p-2 rounded-full bg-white/10"
+              type="button"
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-navigation"
+              className="md:hidden text-white p-2 rounded-full bg-white/10 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              {mobileMenuOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
             </button>
           </div>
         </div>
@@ -142,11 +159,15 @@ const Navbar = React.memo(function Navbar() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
+            id="mobile-navigation"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Primary navigation"
             initial={{ opacity: 0, scale: 0.95, y: -15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -15 }}
             transition={{ type: "spring", stiffness: 350, damping: 30 }}
-            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center pointer-events-auto"
+            className="fixed inset-0 z-[90] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center pointer-events-auto overscroll-contain"
           >
             <div className="flex flex-col items-center gap-8">
               {navLinks.map((link, i) => (

@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { ArrowUpRight, Play, Code2, Film, Layers } from 'lucide-react';
 import { client } from '../lib/sanity';
+import { usePerformanceProfile } from '../lib/performance';
 
 import { Category, Project, projects } from '../data/projects';
 
@@ -26,6 +27,7 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
   const cardRef = useRef<HTMLDivElement>(null);
   const inView = useInView(cardRef, { once: true, margin: '-80px' });
   const [hovered, setHovered] = useState(false);
+  const { enableHoverEffects, lowPowerHardware } = usePerformanceProfile();
   
   // High-performance tracking
   const mouseX = useMotionValue(0);
@@ -39,7 +41,7 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
   const translateY = useTransform(springY, y => y - 300);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if (!cardRef.current || !enableHoverEffects) return;
     const rect = cardRef.current.getBoundingClientRect();
     mouseX.set(e.clientX - rect.left);
     mouseY.set(e.clientY - rect.top);
@@ -51,16 +53,16 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
       initial={{ opacity: 0, y: 60, scale: 0.98 }}
       animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
       transition={{ type: "spring", damping: 30, stiffness: 220, delay: index * 0.08 }}
-      onMouseEnter={() => { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) { glareOpacity.set(1); setHovered(true); } }}
+      onMouseEnter={() => { if (enableHoverEffects) { glareOpacity.set(1); setHovered(true); } }}
       onMouseLeave={() => { glareOpacity.set(0); setHovered(false); }}
       onMouseMove={handleMouseMove}
-      className="group relative rounded-3xl overflow-hidden cursor-pointer"
+      className="group relative rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer"
       style={{
         background: project.gradient,
         boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
         transition: 'border-color 0.4s ease, box-shadow 0.4s ease',
         border: '1px solid rgba(255,255,255,0.06)',
-        willChange: 'transform, opacity',
+        willChange: inView ? 'transform, opacity' : 'auto',
       }}
     >
       {/* Animated top-edge accent line */}
@@ -72,15 +74,15 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
       />
 
       {/* Ambient glow orb */}
-      <div
+      {!lowPowerHardware && <div
         className="absolute -top-20 -right-20 w-60 h-60 rounded-full pointer-events-none transition-opacity duration-500"
         style={{
           background: `radial-gradient(circle, ${project.accentColor}20 0%, transparent 70%)`,
         }}
-      />
+      />}
 
       {/* Glare effect powered by MotionValues mapped to translation */}
-      <motion.div
+      {enableHoverEffects && <motion.div
         className="absolute top-0 left-0 pointer-events-none mix-blend-overlay"
         style={{
           width: 600,
@@ -91,7 +93,7 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
           background: 'radial-gradient(circle 300px at center, rgba(255,255,255,0.15), transparent 100%)',
           willChange: 'transform, opacity'
         }}
-      />
+      />}
 
       <div className="relative z-10 p-8">
         {/* Header row */}
@@ -180,6 +182,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
   const [hovered, setHovered] = useState(false);
+  const { enableHoverEffects, lowPowerHardware } = usePerformanceProfile();
   
   // High-performance tracking
   const mouseX = useMotionValue(0);
@@ -193,7 +196,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
   const translateY = useTransform(springY, y => y - 400);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if (!ref.current || !enableHoverEffects) return;
     const rect = ref.current.getBoundingClientRect();
     mouseX.set(e.clientX - rect.left);
     mouseY.set(e.clientY - rect.top);
@@ -205,7 +208,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
       initial={{ opacity: 0, y: 60, scale: 0.98 }}
       animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
       transition={{ type: "spring", damping: 32, stiffness: 200 }}
-      onMouseEnter={() => { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) { glareOpacity.set(1); setHovered(true); } }}
+      onMouseEnter={() => { if (enableHoverEffects) { glareOpacity.set(1); setHovered(true); } }}
       onMouseLeave={() => { glareOpacity.set(0); setHovered(false); }}
       onMouseMove={handleMouseMove}
       className="relative col-span-full rounded-3xl overflow-hidden cursor-pointer"
@@ -215,7 +218,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
         border: '1px solid rgba(255,255,255,0.07)',
         boxShadow: '0 16px 60px rgba(0,0,0,0.5)',
         transition: 'border-color 0.5s ease, box-shadow 0.5s ease',
-        willChange: 'transform, opacity',
+        willChange: inView ? 'transform, opacity' : 'auto',
       }}
     >
       {/* FEATURED label */}
@@ -230,13 +233,13 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
       </div>
 
       {/* Large accent glow */}
-      <div
+      {!lowPowerHardware && <div
         className="absolute top-0 right-0 w-96 h-96 rounded-full pointer-events-none"
         style={{
           background: `radial-gradient(circle, ${project.accentColor}15 0%, transparent 70%)`,
           filter: 'blur(40px)',
         }}
-      />
+      />}
 
       {/* Top edge line */}
       <div
@@ -247,7 +250,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
       />
 
       {/* Glare effect powered by MotionValues mapped to translation */}
-      <motion.div
+      {enableHoverEffects && <motion.div
         className="absolute top-0 left-0 pointer-events-none mix-blend-overlay"
         style={{
           width: 800,
@@ -258,7 +261,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
           background: 'radial-gradient(circle 400px at center, rgba(255,255,255,0.15), transparent 100%)',
           willChange: 'transform, opacity'
         }}
-      />
+      />}
 
       <div className="relative z-10 p-10 md:p-16 flex flex-col md:flex-row md:items-end gap-8 h-full min-h-[420px]">
         {/* Left — content */}
@@ -355,6 +358,7 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
   const [displayProjects, setDisplayProjects] = useState<Project[]>(projects);
   const headerRef = useRef<HTMLDivElement>(null);
   const headerInView = useInView(headerRef, { once: true, margin: '-80px' });
+  const { lowPowerHardware } = usePerformanceProfile();
 
   useEffect(() => {
     async function fetchProjects() {
@@ -384,7 +388,7 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
   return (
     <section id="showcase" className="relative py-32 bg-bg overflow-hidden">
       {/* Ambient background glows */}
-      <div className="absolute inset-0 pointer-events-none">
+      {!lowPowerHardware && <div className="absolute inset-0 pointer-events-none">
         <div
           className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[600px]"
           style={{
@@ -392,7 +396,7 @@ export default function Showcase({ hideHeader = false }: { hideHeader?: boolean 
             filter: 'blur(60px)',
           }}
         />
-      </div>
+      </div>}
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 relative z-10">
         {/* ── Section Header ── */}

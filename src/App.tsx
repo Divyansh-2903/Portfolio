@@ -8,6 +8,7 @@ import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 import type {} from 'framer-motion'; // keep tree-shaking clean
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
+import { usePerformanceProfile } from './lib/performance';
 
 // Utility for suspense fallbacks (prevents footer from flashing up during lazy load)
 const LoadingFallback = () => <div className="min-h-screen" />;
@@ -139,25 +140,28 @@ const Work: React.FC = () => {
 function AppContent() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
+  const { enableHeavyVisuals, lowPowerHardware, reducedMotion } = usePerformanceProfile();
 
   return (
     <>
       <ScrollToTop />
-      {!loading && (
+      {!loading && enableHeavyVisuals && (
         <div className="fixed inset-0 z-0 w-full h-full pointer-events-none">
           <Suspense fallback={null}>
             <LaserFlow
               sentinelId="hero-section"
+              quality={lowPowerHardware ? "low" : "balanced"}
+              targetFps={lowPowerHardware ? 45 : 55}
               horizontalSizing={2.5}
               verticalSizing={20}
-              wispDensity={1.5}
-              wispSpeed={20}
-              wispIntensity={5}
-              flowSpeed={0.5}
-              flowStrength={0.4}
-              fogIntensity={0.35}
+              wispDensity={1}
+              wispSpeed={12}
+              wispIntensity={3}
+              flowSpeed={0.35}
+              flowStrength={0.25}
+              fogIntensity={0.22}
               fogScale={0.4}
-              fogFallSpeed={0.8}
+              fogFallSpeed={0.45}
               decay={1}
               falloffStart={2}
               color="#A78BFA"
@@ -196,7 +200,7 @@ function AppContent() {
           <StickyCTA />
 
           <Suspense fallback={null}>
-            <GlobalVignette />
+            {!reducedMotion && <GlobalVignette />}
           </Suspense>
         </>
       )}
@@ -208,9 +212,15 @@ function StickyCTA() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      // Show after scrolling down 40% of viewport height
-      setShow(window.scrollY > window.innerHeight * 0.4);
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        // Show after scrolling down 40% of viewport height
+        setShow(window.scrollY > window.innerHeight * 0.4);
+        ticking = false;
+      });
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -255,14 +265,21 @@ function StickyCTA() {
  */
 function GlobalVignette() {
   const [showBlur, setShowBlur] = useState(false);
+  const { lowPowerHardware } = usePerformanceProfile();
 
   useEffect(() => {
+    let ticking = false;
     const update = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
       const scrollY   = window.scrollY;
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       const inHero   = scrollY < 380;
       const inFooter = maxScroll - scrollY < 420;
       setShowBlur(!inHero && !inFooter);
+        ticking = false;
+      });
     };
 
     update();
@@ -283,8 +300,8 @@ function GlobalVignette() {
       />
 
       {/* ── Bottom blur: shown only between hero and footer zones ── */}
-      {showBlur && (
-        <GradualBlur position="bottom" height="5rem" strength={7} layers={9} zIndex={40} />
+      {showBlur && !lowPowerHardware && (
+        <GradualBlur position="bottom" height="4rem" strength={5} layers={4} zIndex={40} />
       )}
     </>
   );

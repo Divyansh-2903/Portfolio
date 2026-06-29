@@ -23,6 +23,8 @@ type Props = {
   fogFallSpeed?: number;
   color?: string;
   sentinelId?: string;
+  targetFps?: number;
+  quality?: 'low' | 'balanced' | 'high';
 };
 
 const VERT = `
@@ -294,7 +296,9 @@ export const LaserFlow: React.FC<Props> = ({
   falloffStart = 1.2,
   fogFallSpeed = 0.6,
   color = '#FF79C6',
-  sentinelId
+  sentinelId,
+  targetFps = 55,
+  quality = 'balanced'
 }) => {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -321,7 +325,7 @@ export const LaserFlow: React.FC<Props> = ({
       alpha: false,
       depth: false,
       stencil: false,
-      powerPreference: 'high-performance',
+      powerPreference: quality === 'low' ? 'low-power' : 'high-performance',
       premultipliedAlpha: false,
       preserveDrawingBuffer: false,
       failIfMajorPerformanceCaveat: false,
@@ -329,8 +333,9 @@ export const LaserFlow: React.FC<Props> = ({
     });
     rendererRef.current = renderer;
 
-    const maxDpr = window.innerWidth < 768 ? 1 : 2;
-    baseDprRef.current = Math.min(dpr ?? (window.devicePixelRatio || 1), maxDpr);
+    const qualityDpr = quality === 'high' ? 1.5 : quality === 'balanced' ? 1.15 : 0.85;
+    const viewportDpr = window.innerWidth < 768 ? 0.8 : qualityDpr;
+    baseDprRef.current = Math.min(dpr ?? (window.devicePixelRatio || 1), viewportDpr);
     currentDprRef.current = baseDprRef.current;
 
     renderer.setPixelRatio(currentDprRef.current);
@@ -472,9 +477,9 @@ export const LaserFlow: React.FC<Props> = ({
     let raf = 0;
 
     const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
-    const dprFloor = 0.6;
-    const lowerThresh = 50;
-    const upperThresh = 58;
+    const dprFloor = quality === 'low' ? 0.45 : 0.6;
+    const lowerThresh = Math.max(30, targetFps - 6);
+    const upperThresh = Math.min(58, targetFps + 3);
     let lastDprChange = 0;
     const dprChangeCooldown = 2000;
 
@@ -567,7 +572,7 @@ export const LaserFlow: React.FC<Props> = ({
       renderer.forceContextLoss();
       if (mount.contains(canvas)) mount.removeChild(canvas);
     };
-  }, [dpr, sentinelId]);
+  }, [dpr, sentinelId, quality, targetFps]);
 
   useEffect(() => {
     const uniforms = uniformsRef.current;

@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Mail } from 'lucide-react';
 
 import RotatingText from './RotatingText';
+import LightPillar from './canvas/LightPillar';
 import { usePerformanceProfile } from '../lib/performance';
 
 
@@ -33,7 +34,7 @@ const titleReveal = {
 
 export default function Hero() {
   const container = useRef<HTMLElement>(null);
-  const { reducedMotion, lowPowerHardware, smallScreen } = usePerformanceProfile();
+  const { reducedMotion, lowPowerHardware, smallScreen, enableHeavyVisuals } = usePerformanceProfile();
   const simplifyMotion = reducedMotion || lowPowerHardware || smallScreen;
 
   // Scroll-driven blur/fade — activates the moment user starts scrolling
@@ -41,7 +42,6 @@ export default function Hero() {
     target: container,
     offset: ['start start', 'end start'],
   });
-  const blurFilter  = useTransform(scrollYProgress, [0, 0.55], ['blur(0px)', simplifyMotion ? 'blur(0px)' : 'blur(12px)']);
   const scrollOp    = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
   const scrollY     = useTransform(scrollYProgress, [0, 0.55], [0, simplifyMotion ? -12 : -40]);
 
@@ -51,10 +51,31 @@ export default function Hero() {
       ref={container}
       className="relative min-h-[100svh] flex flex-col justify-center items-center pt-24 pb-16 overflow-hidden"
     >
+      <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+        {enableHeavyVisuals ? (
+          <LightPillar
+            topColor="#A78BFA"
+            bottomColor="#818CF8"
+            intensity={0.95}
+            rotationSpeed={0.18}
+            glowAmount={0.005}
+            pillarWidth={2.9}
+            pillarHeight={0.42}
+            noiseIntensity={0.28}
+            pillarRotation={0}
+            interactive={false}
+            quality="high"
+            mixBlendMode="screen"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(167,139,250,0.28),transparent_30%),radial-gradient(circle_at_50%_58%,rgba(129,140,248,0.18),transparent_42%)]" />
+        )}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(167,139,250,0.16),transparent_34%),linear-gradient(to_bottom,rgba(8,8,8,0.12),rgba(8,8,8,0.62)_84%)]" />
+      </div>
       {/* Main content — centered layout using more of the full screen */}
       {/* Scroll blur wrapper — drives blur + fade as hero leaves viewport */}
       <motion.div
-        style={{ filter: blurFilter, opacity: scrollOp, y: scrollY }}
+        style={{ opacity: scrollOp, y: scrollY }}
         className="w-full relative z-[50]"
       >
       <motion.div

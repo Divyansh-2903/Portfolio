@@ -15,10 +15,19 @@ const Navbar = React.memo(function Navbar() {
   const [activePath, setActivePath] = useState(location.pathname + location.hash || '/');
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const nextScrolled = window.scrollY > 50;
+        setScrolled((current) => (current === nextScrolled ? current : nextScrolled));
+        ticking = false;
+      });
     };
-    window.addEventListener('scroll', handleScroll);
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

@@ -3,7 +3,7 @@ import { motion, useScroll, useSpring, useMotionValue } from 'framer-motion';
 import { usePerformanceProfile } from '../lib/performance';
 
 export default function GlobalElements() {
-  const { enableHoverEffects } = usePerformanceProfile();
+  const { enableHeavyVisuals, enableHoverEffects } = usePerformanceProfile();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -20,7 +20,7 @@ export default function GlobalElements() {
   const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
-    if (!enableHoverEffects) return;
+    if (!enableHeavyVisuals || !enableHoverEffects) return;
 
     const updateMousePosition = (e: MouseEvent) => {
       mouseX.set(e.clientX);
@@ -43,7 +43,7 @@ export default function GlobalElements() {
       window.removeEventListener('mousemove', updateMousePosition);
       window.removeEventListener('mouseover', handleMouseOver);
     };
-  }, [enableHoverEffects, mouseX, mouseY]);
+  }, [enableHeavyVisuals, enableHoverEffects, mouseX, mouseY]);
 
   return (
     <>
@@ -54,7 +54,7 @@ export default function GlobalElements() {
       />
 
       {/* Custom Cursor */}
-      {enableHoverEffects && <motion.div
+      {enableHeavyVisuals && enableHoverEffects && <motion.div
         className="fixed top-0 left-0 w-4 h-4 rounded-full bg-primary pointer-events-none z-[200] mix-blend-screen"
         style={{
           x: cursorX,

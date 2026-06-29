@@ -28,9 +28,6 @@ const Showcase = lazy(() => import('./components/Showcase'));
 const GradualBlur = lazy(() => import('./components/GradualBlur'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
 
-// Heavy Canvas components
-const LaserFlow = lazy(() => import('./components/canvas/LaserFlow'));
-
 // Global Scroll Reset
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -140,37 +137,11 @@ const Work: React.FC = () => {
 function AppContent() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
-  const { enableHeavyVisuals, lowPowerHardware, reducedMotion } = usePerformanceProfile();
+  const { reducedMotion } = usePerformanceProfile();
 
   return (
     <>
       <ScrollToTop />
-      {!loading && enableHeavyVisuals && (
-        <div className="fixed inset-0 z-0 w-full h-full pointer-events-none">
-          <Suspense fallback={null}>
-            <LaserFlow
-              sentinelId="hero-section"
-              quality={lowPowerHardware ? "low" : "balanced"}
-              targetFps={lowPowerHardware ? 45 : 55}
-              horizontalSizing={2.5}
-              verticalSizing={20}
-              wispDensity={1}
-              wispSpeed={12}
-              wispIntensity={3}
-              flowSpeed={0.35}
-              flowStrength={0.25}
-              fogIntensity={0.22}
-              fogScale={0.4}
-              fogFallSpeed={0.45}
-              decay={1}
-              falloffStart={2}
-              color="#A78BFA"
-              horizontalBeamOffset={0}
-              verticalBeamOffset={-0.3}
-            />
-          </Suspense>
-        </div>
-      )}
 
       <AnimatePresence mode="wait">
         {loading && <LoadingScreen key="loading" onComplete={() => setLoading(false)} />}
@@ -265,7 +236,7 @@ function StickyCTA() {
  */
 function GlobalVignette() {
   const [showBlur, setShowBlur] = useState(false);
-  const { lowPowerHardware } = usePerformanceProfile();
+  const { enableHeavyVisuals } = usePerformanceProfile();
 
   useEffect(() => {
     let ticking = false;
@@ -300,8 +271,8 @@ function GlobalVignette() {
       />
 
       {/* ── Bottom blur: shown only between hero and footer zones ── */}
-      {showBlur && !lowPowerHardware && (
-        <GradualBlur position="bottom" height="4rem" strength={5} layers={4} zIndex={40} />
+      {showBlur && enableHeavyVisuals && (
+        <GradualBlur position="bottom" height="3rem" strength={3} layers={2} zIndex={40} />
       )}
     </>
   );

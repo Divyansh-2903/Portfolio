@@ -23,16 +23,19 @@ function readProfile() {
   const reducedMotion = matches('(prefers-reduced-motion: reduce)');
   const coarsePointer = matches('(hover: none), (pointer: coarse)');
   const smallScreen = matches('(max-width: 767px)');
+  const mediumScreen = matches('(max-width: 1023px)');
   const lowPowerHardware = cores <= 4 || memory <= 4 || saveData || slowNetwork;
+  const constrained = reducedMotion || smallScreen || lowPowerHardware;
 
   return {
     reducedMotion,
     coarsePointer,
     smallScreen,
+    mediumScreen,
     lowPowerHardware,
-    enableHeavyVisuals: !reducedMotion && !smallScreen && !lowPowerHardware,
-    enableHoverEffects: !reducedMotion && !coarsePointer,
-    enableSmoothScroll: !reducedMotion && !coarsePointer && !lowPowerHardware,
+    enableHeavyVisuals: !constrained,
+    enableHoverEffects: !constrained && !coarsePointer,
+    enableSmoothScroll: !reducedMotion && !coarsePointer && !lowPowerHardware && !mediumScreen,
   };
 }
 
@@ -44,6 +47,7 @@ export function getPerformanceProfile(): PerformanceProfile {
       reducedMotion: false,
       coarsePointer: false,
       smallScreen: false,
+      mediumScreen: false,
       lowPowerHardware: false,
       enableHeavyVisuals: true,
       enableHoverEffects: true,
@@ -62,15 +66,23 @@ export function usePerformanceProfile() {
       window.matchMedia('(prefers-reduced-motion: reduce)'),
       window.matchMedia('(hover: none), (pointer: coarse)'),
       window.matchMedia('(max-width: 767px)'),
+      window.matchMedia('(max-width: 1023px)'),
     ];
 
+    let resizeTimer: number | null = null;
     const update = () => setProfile(getPerformanceProfile());
+    const updateAfterResize = () => {
+      if (resizeTimer) window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(update, 150);
+    };
+
     mediaQueries.forEach((mq) => mq.addEventListener('change', update));
-    window.addEventListener('resize', update, { passive: true });
+    window.addEventListener('resize', updateAfterResize, { passive: true });
 
     return () => {
       mediaQueries.forEach((mq) => mq.removeEventListener('change', update));
-      window.removeEventListener('resize', update);
+      window.removeEventListener('resize', updateAfterResize);
+      if (resizeTimer) window.clearTimeout(resizeTimer);
     };
   }, []);
 

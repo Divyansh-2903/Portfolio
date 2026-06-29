@@ -6,7 +6,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 import type {} from 'framer-motion'; // keep tree-shaking clean
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useLenis } from 'lenis/react';
 import { usePerformanceProfile } from './lib/performance';
 
@@ -18,9 +18,9 @@ import Navbar from './components/Navbar';
 import LoadingScreen from './components/LoadingScreen';
 import GlobalElements from './components/GlobalElements';
 import Footer from './components/Footer';
+import Hero from './components/Hero';
 
 // Lazy Load Pages only
-const Hero = lazy(() => import('./components/Hero'));
 const AboutSection = lazy(() => import('./components/AboutSection'));
 const Contact = lazy(() => import('./components/Contact'));
 const Story = lazy(() => import('./components/Story'));
@@ -181,6 +181,9 @@ function AppContent() {
 
 function StickyCTA() {
   const [show, setShow] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const lenis = useLenis();
 
   useEffect(() => {
     let ticking = false;
@@ -199,9 +202,21 @@ function StickyCTA() {
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const contactSection = document.getElementById('contact');
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: 'smooth' });
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        if (lenis) {
+          lenis.scrollTo('#contact', { offset: -80 });
+        } else {
+          document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      if (lenis) {
+        lenis.scrollTo('#contact', { offset: -80 });
+      } else {
+        document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 

@@ -1,8 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { ArrowUpRight, Play, Code2, Film, Layers } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { client } from '../lib/sanity';
 import { usePerformanceProfile } from '../lib/performance';
+
+const MotionLink = motion(Link);
 
 import { Category, Project, projects } from '../data/projects';
 
@@ -118,8 +121,8 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
             <p className="text-xs font-mono text-white/40 mt-1 uppercase tracking-widest">{project.role}</p>
           </div>
 
-          <motion.a
-            href={`/work/${project.id}`}
+          <MotionLink
+            to={`/work/${project.id}`}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className="shrink-0 flex items-center justify-center w-11 h-11 rounded-full"
@@ -131,7 +134,7 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
             }}
           >
             <ArrowUpRight size={18} />
-          </motion.a>
+          </MotionLink>
         </div>
 
         {/* Description */}
@@ -162,14 +165,14 @@ const ProjectCard = React.memo(({ project, index }: { project: Project; index: n
             ))}
           </div>
 
-          <motion.a
-            href={`/work/${project.id}`}
+          <MotionLink
+            to={`/work/${project.id}`}
             whileHover={{ x: 4 }}
             className="shrink-0 flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest"
             style={{ color: project.accentColor }}
           >
             Case Study <ArrowUpRight size={12} />
-          </motion.a>
+          </MotionLink>
         </div>
       </div>
     </motion.div>
@@ -311,8 +314,8 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
           </div>
 
           <div className="flex items-center gap-4">
-            <motion.a
-              href={`/work/${project.id}`}
+            <MotionLink
+              to={`/work/${project.id}`}
               whileHover={{ scale: 1.04, y: -2 }}
               whileTap={{ scale: 0.97 }}
               className="flex items-center gap-3 px-7 py-4 rounded-full font-bold text-sm uppercase tracking-widest"
@@ -323,7 +326,7 @@ const FeaturedCard = React.memo(({ project }: { project: Project }) => {
               }}
             >
               View Case Study <ArrowUpRight size={16} />
-            </motion.a>
+            </MotionLink>
 
             {project.category === 'video' && (
               <motion.button

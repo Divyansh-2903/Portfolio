@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import _Marquee from 'react-fast-marquee';
 const Marquee = (_Marquee as any).default || _Marquee;
 import { Mail, Phone, Github, Linkedin, MessageCircle } from 'lucide-react';
+import { useLenis } from 'lenis/react';
 
 /* ─── Custom Icons ────────────────────────────────────────── */
 const WhatsappIcon = ({ size = 24, ...props }: any) => (
@@ -39,6 +40,16 @@ SocialIcon.displayName = 'SocialIcon';
 /* ─── Footer ─────────────────────────────────────────────── */
 const Footer = React.memo(function Footer() {
   const year = new Date().getFullYear();
+  const lenis = useLenis();
+
+  const handleBackToTop = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (lenis) {
+      lenis.scrollTo(0);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
     <footer className="relative z-50 overflow-hidden bg-bg">
@@ -149,6 +160,7 @@ const Footer = React.memo(function Footer() {
           </div>
 
           <a href="#hero"
+            onClick={handleBackToTop}
             className="font-mono text-[11px] uppercase tracking-widest text-white/18 hover:text-primary/60 transition-colors duration-300">
             ↑ Back to top
           </a>
